@@ -23,7 +23,7 @@ def threaded(fn):
 class Addon(Plugin):
     __name__    = "Addon"
     __type__    = "hook"  #@TODO: Change to `addon` in 0.4.10
-    __version__ = "0.06"
+    __version__ = "0.07"
     __status__  = "testing"
 
     __threaded__ = []  #@TODO: Remove in 0.4.10
@@ -101,11 +101,11 @@ class Addon(Plugin):
         except Exception, e:
             self.log_error(_("Error executing periodical task: %s") % e)
 
-        self.cb = self.pyload.scheduler.addJob(self.interval, self._periodical, [threaded], threaded=threaded)
+        self.init_periodical(self.interval, threaded)
 
 
     def periodical(self):
-        pass
+        raise NotImplementedError
 
 
     @property
