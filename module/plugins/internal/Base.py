@@ -28,12 +28,6 @@ def parse_fileInfo(klass, url="", html=""):
 def create_getInfo(klass):
     def get_info(urls):
         for url in urls:
-            try:
-                url = replace_patterns(url, klass.URL_REPLACEMENTS)
-
-            except Exception:
-                pass
-
             yield parse_fileInfo(klass, url)
 
     return get_info
@@ -52,7 +46,7 @@ def check_abort(fn):
 class Base(Plugin):
     __name__    = "Base"
     __type__    = "base"
-    __version__ = "0.03"
+    __version__ = "0.07"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
@@ -61,6 +55,9 @@ class Base(Plugin):
     __description__ = """Base plugin for Hoster and Crypter"""
     __license__     = "GPLv3"
     __authors__     = [("Walter Purcaro", "vuolter@gmail.com")]
+
+
+    URL_REPLACEMENTS = []
 
 
     def __init__(self, pyfile):
@@ -110,11 +107,18 @@ class Base(Plugin):
 
     @classmethod
     def get_info(cls, url="", html=""):
-        url  = fixurl(url)
-        info = {'name'  : parse_name(url),
-                'size'  : 0,
-                'status': 3 if url else 8,
-                'url'   : url}
+        url = fixurl(url, unquote=True)
+
+        info = {'name'   : parse_name(url),
+                'pattern': {},
+                'size'   : 0,
+                'status' : 3 if url else 8,
+                'url'    : replace_patterns(url, cls.URL_REPLACEMENTS)}
+
+        try:
+            info['pattern'] = re.match(cls.__pattern__, url).groupdict()
+        except Exception:
+            pass
 
         return info
 
@@ -212,25 +216,29 @@ class Base(Plugin):
         self.log_debug("RECONNECT %s required" % ("" if reconnect else "not"),
                        "Previous wantReconnect: %s" % self.wantReconnect)
         self.wantReconnect = bool(reconnect)
+        return True
 
 
-    def set_wait(self, seconds, reconnect=None):
+    def set_wait(self, seconds, strict=False):
         """
         Set a specific wait time later used with `wait`
 
         :param seconds: wait time in seconds
         :param reconnect: True if a reconnect would avoid wait time
         """
-        wait_time  = max(int(seconds), 1)
-        wait_until = time.time() + wait_time + 1
+        wait_time = float(seconds)
 
-        self.log_debug("WAIT set to %d seconds" % wait_time,
-                       "Previous waitUntil: %f" % self.pyfile.waitUntil)
+        if wait_time < 0:
+            return False
 
-        self.pyfile.waitUntil = wait_until
+        old_wait_until = self.pyfile.waitUntil
+        new_wait_until = time.time() + wait_time + float(not strict)
 
-        if reconnect is not None:
-            self.set_reconnect(reconnect)
+        self.log_debug("WAIT set to timestamp %f" % new_wait_until,
+                       "Previous waitUntil: %f"   % old_wait_until)
+
+        self.pyfile.waitUntil = new_wait_until
+        return True
 
 
     def wait(self, seconds=None, reconnect=None):
@@ -359,7 +367,13 @@ class Base(Plugin):
         :param wait: time to wait in seconds before retry
         :param msg: message passed to fail if attemps value was reached
         """
-        id = inspect.currentframe().f_back.f_lineno
+        frame = inspect.currentframe()
+
+        try:
+            id = frame.f_back.f_lineno
+        finally:
+            del frame
+
         if id not in self.retries:
             self.retries[id] = 0
 
@@ -378,7 +392,7 @@ class Base(Plugin):
 
 
     def fixurl(self, url, baseurl=None, unquote=True):
-        url = fixurl(url)
+        #url = fixurl(url, unquote=False)
 
         if not baseurl:
             baseurl = fixurl(self.pyfile.url)
@@ -416,19 +430,19 @@ class Base(Plugin):
             self.abort()
 
 
-    def direct_link(self, url, follow_location=None):
+    def direct_link(self, url, redirect=False):
         link = ""
 
-        if follow_location is None:
-            redirect = 1
+        if not redirect:
+            conn = 1
 
-        elif type(follow_location) is int:
-            redirect = max(follow_location, 1)
+        elif type(redirect) is int:
+            conn = max(redirect, 1)
 
         else:
-            redirect = self.get_config("maxredirs", 10, "UserAgentSwitcher")
+            conn = self.get_config("maxredirs", 5, plugin="UserAgentSwitcher")
 
-        for i in xrange(redirect):
+        for i in xrange(conn):
             try:
                 self.log_debug("Redirect #%d to: %s" % (i, url))
                 header = self.load(url, just_header=True)
@@ -465,7 +479,7 @@ class Base(Plugin):
                 if header.get('code') == 302:
                     link = location
 
-                if follow_location:
+                if redirect:
                     url = location
                     continue
 

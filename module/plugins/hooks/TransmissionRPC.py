@@ -18,7 +18,8 @@ class TransmissionRPC(Addon):
     __status__  = "testing"
 
     __pattern__ = r"https?://.+\.torrent|magnet:\?.+"
-    __config__  = [("rpc_url", "str", "Transmission RPC URL", "http://127.0.0.1:9091/transmission/rpc")]
+    __config__  = [("activated", "bool", "Activated"           , False                                   ),
+                   ("rpc_url"  , "str" , "Transmission RPC URL", "http://127.0.0.1:9091/transmission/rpc")]
 
     __description__ = """Send torrent and magnet URLs to Transmission Bittorent daemon via RPC"""
     __license__     = "GPLv3"
@@ -64,15 +65,15 @@ class TransmissionRPC(Addon):
                                          req=req)
 
                 except Exception, e:
-                     self.log_error(e)
+                     self.log_error(e, trace=True)
                      return
 
             else:
-                 self.log_error(e)
+                 self.log_error(e, trace=True)
                  return
 
         except Exception, e:
-             self.log_error(e)
+             self.log_error(e, trace=True)
              return
 
         try:
@@ -81,4 +82,4 @@ class TransmissionRPC(Addon):
                 self.log_debug("Result: %s" % res['result'])
 
         except Exception, e:
-            self.log_error(e)
+            self.log_error(e, trace=True)
