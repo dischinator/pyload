@@ -15,6 +15,7 @@ class Ftp(Hoster):
     __status__  = "testing"
 
     __pattern__ = r'(?:ftps?|sftp)://([\w\-.]+(:[\w\-.]+)?@)?[\w\-.]+(:\d+)?/.+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Download from ftp directory"""
     __license__     = "GPLv3"

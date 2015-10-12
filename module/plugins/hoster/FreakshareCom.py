@@ -14,6 +14,7 @@ class FreakshareCom(Hoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?freakshare\.(net|com)/files/\S*?/'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Freakshare.com hoster plugin"""
     __license__     = "GPLv3"

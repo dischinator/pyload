@@ -13,7 +13,8 @@ class RPNetBiz(MultiHoster):
     __status__  = "testing"
 
     __pattern__ = r'https?://.+rpnet\.biz'
-    __config__  = [("use_premium" , "bool", "Use premium account if available"    , True),
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_premium" , "bool", "Use premium account if available"    , True),
                    ("revertfailed", "bool", "Revert to standard download if fails", True)]
 
     __description__ = """RPNet.biz multi-hoster plugin"""

@@ -4,16 +4,15 @@ import re
 import time
 import urlparse
 
-from module.common.json_layer import json_loads
 from module.plugins.internal.Account import Account
 # from module.plugins.internal.MultiAccount import MultiAccount
-from module.plugins.internal.Plugin import parse_html_form, set_cookie
+from module.plugins.internal.Plugin import parse_html_form, parse_time, set_cookie
 
 
 class XFSAccount(Account):
     __name__    = "XFSAccount"
     __type__    = "account"
-    __version__ = "0.50"
+    __version__ = "0.52"
     __status__  = "testing"
 
     __description__ = """XFileSharing account plugin"""
@@ -39,6 +38,7 @@ class XFSAccount(Account):
     LEECH_TRAFFIC_UNIT    = "MB"  #: Used only if no group <U> was found
 
     LOGIN_FAIL_PATTERN = r'Incorrect Login or Password|account was banned|Error<'
+    LOGIN_BAN_PATTERN  = r'>(Your IP.+?)<a'
     LOGIN_SKIP_PATTERN = r'op=logout'
 
 
@@ -62,18 +62,15 @@ class XFSAccount(Account):
         premium      = None
 
         if not self.PLUGIN_URL:  #@TODO: Remove in 0.4.10
-            return {'validuntil'  : validuntil,
-                    'trafficleft' : trafficleft,
-                    'leechtraffic': leechtraffic,
-                    'premium'     : premium}
+            return
 
-        html = self.load(self.PLUGIN_URL,
-                         get={'op': "my_account"},
-                         cookies=self.COOKIES)
+        self.html = self.load(self.PLUGIN_URL,
+                              get={'op': "my_account"},
+                              cookies=self.COOKIES)
 
-        premium = True if re.search(self.PREMIUM_PATTERN, html) else False
+        premium = True if re.search(self.PREMIUM_PATTERN, self.html) else False
 
-        m = re.search(self.VALID_UNTIL_PATTERN, html)
+        m = re.search(self.VALID_UNTIL_PATTERN, self.html)
         if m is not None:
             expiredate = m.group(1).strip()
             self.log_debug("Expire date: " + expiredate)
@@ -96,7 +93,7 @@ class XFSAccount(Account):
         else:
             self.log_debug("VALID_UNTIL_PATTERN not found")
 
-        m = re.search(self.TRAFFIC_LEFT_PATTERN, html)
+        m = re.search(self.TRAFFIC_LEFT_PATTERN, self.html)
         if m is not None:
             try:
                 traffic = m.groupdict()
@@ -124,7 +121,7 @@ class XFSAccount(Account):
         else:
             self.log_debug("TRAFFIC_LEFT_PATTERN not found")
 
-        leech = [m.groupdict() for m in re.finditer(self.LEECH_TRAFFIC_PATTERN, html)]
+        leech = [m.groupdict() for m in re.finditer(self.LEECH_TRAFFIC_PATTERN, self.html)]
         if leech:
             leechtraffic = 0
             try:
@@ -167,18 +164,16 @@ class XFSAccount(Account):
 
         if not self.PLUGIN_URL:
             self.fail_login(_("Missing PLUGIN_URL"))
-        else:
-            self.PLUGIN_URL = self.PLUGIN_URL.rstrip('/') + "/"
 
         if not self.LOGIN_URL:
             self.LOGIN_URL  = urlparse.urljoin(self.PLUGIN_URL, "login.html")
 
-        html = self.load(self.LOGIN_URL, cookies=self.COOKIES)
+        self.html = self.load(self.LOGIN_URL, cookies=self.COOKIES)
 
-        if re.search(self.LOGIN_SKIP_PATTERN, html):
+        if re.search(self.LOGIN_SKIP_PATTERN, self.html):
             self.skip_login()
 
-        action, inputs = parse_html_form('name="FL"', html)
+        action, inputs = parse_html_form('name="FL"', self.html)
         if not inputs:
             inputs = {'op'      : "login",
                       'redirect': self.PLUGIN_URL}
@@ -189,17 +184,42 @@ class XFSAccount(Account):
         if action:
             url = urlparse.urljoin("http://", action)
         else:
-            url = self.PLUGIN_URL
+            url = self.LOGIN_URL
 
-        html = self.load(url, post=inputs, cookies=self.COOKIES)
+        self.html = self.load(url, post=inputs, cookies=self.COOKIES)
 
-        try:
-            json = json_loads(html)
+        self.check_errors()
 
-        except ValueError:
-            if re.search(self.LOGIN_FAIL_PATTERN, html):
-                self.fail_login()
 
-        else:
-            if not 'success' in json or not json['success']:
-                self.fail_login()
+    def check_errors(self):
+        if not self.html:
+            self.log_warning(_("No html code to check"))
+            return
+
+        m = re.search(self.LOGIN_BAN_PATTERN, self.html)
+        if m is not None:
+            try:
+                errmsg = m.group(1)
+
+            except (AttributeError, IndexError):
+                errmsg = m.group(0)
+
+            finally:
+                errmsg = re.sub(r'<.*?>', " ", errmsg.strip())
+
+            self.timeout = parse_time(errmsg)
+            self.fail_login(errmsg)
+
+        m = re.search(self.LOGIN_FAIL_PATTERN, self.html)
+        if m is not None:
+            try:
+                errmsg = m.group(1)
+
+            except (AttributeError, IndexError):
+                errmsg = m.group(0)
+
+            finally:
+                errmsg = re.sub(r'<.*?>', " ", errmsg.strip())
+
+            self.timeout = self.LOGIN_TIMEOUT
+            self.fail_login(errmsg)

@@ -18,7 +18,8 @@ class RelinkUs(Crypter):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?relink\.us/(f/|((view|go)\.php\?id=))(?P<ID>.+)'
-    __config__  = [("use_subfolder"     , "bool", "Save package to subfolder"          , True),
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]
 
     __description__ = """Relink.us decrypter plugin"""

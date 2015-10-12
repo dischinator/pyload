@@ -37,6 +37,7 @@ class FilesMailRu(Hoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?files\.mail\.ru/.+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Files.mail.ru hoster plugin"""
     __license__     = "GPLv3"

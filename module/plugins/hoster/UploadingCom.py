@@ -15,6 +15,7 @@ class UploadingCom(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?uploading\.com/files/(?:get/)?(?P<ID>\w+)'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Uploading.com hoster plugin"""
     __license__     = "GPLv3"

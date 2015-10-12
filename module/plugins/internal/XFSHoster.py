@@ -17,7 +17,8 @@ class XFSHoster(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
-    __config__  = [("use_premium"     , "bool", "Use premium account if available"          , True),
+    __config__  = [("activated"       , "bool", "Activated"                                 , True),
+                   ("use_premium"     , "bool", "Use premium account if available"          , True),
                    ("fallback_premium", "bool", "Fallback to free download if premium fails", True),
                    ("chk_filesize"    , "bool", "Check file size"                           , True)]
 
@@ -80,7 +81,7 @@ class XFSHoster(SimpleHoster):
             if self.account:
                 account = self.account
             else:
-                account = self.pyload.accountManager.getAccountPlugin(self.__name__)
+                account = self.pyload.accountManager.getAccountPlugin(self.classname)
 
             if account and hasattr(account, "PLUGIN_DOMAIN") and account.PLUGIN_DOMAIN:
                 self.PLUGIN_DOMAIN = account.PLUGIN_DOMAIN
@@ -158,7 +159,7 @@ class XFSHoster(SimpleHoster):
 
         action, inputs = self.parse_html_form('F1')
         if not inputs:
-            self.retry(msg=self.info['error'] if 'error' in self.info else _("TEXTAREA F1 not found"))
+            self.retry(msg=self.info.get('error') or _("TEXTAREA F1 not found"))
 
         self.log_debug(inputs)
 
@@ -184,7 +185,7 @@ class XFSHoster(SimpleHoster):
         header = self.load(m.group(1), just_header=True)
 
         if 'location' in header:  #: Direct download link
-            self.link = header['location']
+            self.link = header.get('location')
 
 
     def get_post_parameters(self):
@@ -196,7 +197,7 @@ class XFSHoster(SimpleHoster):
         if not inputs:
             action, inputs = self.parse_html_form('F1')
             if not inputs:
-                self.retry(msg=self.info['error'] if 'error' in self.info else _("TEXTAREA F1 not found"))
+                self.retry(msg=self.info.get('error') or _("TEXTAREA F1 not found"))
 
         self.log_debug(inputs)
 

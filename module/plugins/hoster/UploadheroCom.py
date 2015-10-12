@@ -16,7 +16,8 @@ class UploadheroCom(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?uploadhero\.com?/dl/\w+'
-    __config__  = [("use_premium", "bool", "Use premium account if available", True)]
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """UploadHero.co plugin"""
     __license__     = "GPLv3"

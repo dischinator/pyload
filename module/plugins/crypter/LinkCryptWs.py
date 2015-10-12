@@ -18,6 +18,7 @@ class LinkCryptWs(Crypter):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?linkcrypt\.ws/(dir|container)/(?P<ID>\w+)'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """LinkCrypt.ws decrypter plugin"""
     __license__     = "GPLv3"

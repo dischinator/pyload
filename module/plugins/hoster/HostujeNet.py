@@ -12,6 +12,7 @@ class HostujeNet(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?hostuje\.net/\w+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Hostuje.net hoster plugin"""
     __license__     = "GPLv3"

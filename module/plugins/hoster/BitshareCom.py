@@ -15,7 +15,8 @@ class BitshareCom(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?bitshare\.com/(files/)?(?(1)|\?f=)(?P<ID>\w+)(?(1)/(?P<NAME>.+?)\.html)'
-    __config__  = [("use_premium", "bool", "Use premium account if available", True)]
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Bitshare.com hoster plugin"""
     __license__     = "GPLv3"
@@ -84,7 +85,7 @@ class BitshareCom(SimpleHoster):
         if self.premium:
             header = self.load(self.pyfile.url, just_header=True)
             if 'location' in header:
-                return header['location']
+                return header.get('location')
 
         #: Get download info
         self.log_debug("Getting download info")

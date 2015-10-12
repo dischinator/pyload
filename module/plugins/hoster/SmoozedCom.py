@@ -11,7 +11,8 @@ class SmoozedCom(MultiHoster):
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'  #: Since we want to allow the user to specify the list of hoster to use we let MultiHoster.activate
-    __config__  = [("use_premium" , "bool", "Use premium account if available"    , True),
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_premium" , "bool", "Use premium account if available"    , True),
                    ("revertfailed", "bool", "Revert to standard download if fails", True)]
 
     __description__ = """Smoozed.com hoster plugin"""
@@ -59,4 +60,4 @@ class SmoozedCom(MultiHoster):
         if not "location" in header:
             self.fail(_("Unable to initialize download"))
         else:
-            self.link = header['location'][-1] if isinstance(header['location'], list) else header['location']
+            self.link = header.get('location')[-1] if isinstance(header.get('location'), list) else header.get('location')

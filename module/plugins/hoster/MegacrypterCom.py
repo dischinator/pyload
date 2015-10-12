@@ -14,6 +14,7 @@ class MegacrypterCom(MegaCoNz):
     __status__  = "testing"
 
     __pattern__ = r'https?://\w{0,10}\.?megacrypter\.com/[\w\-!]+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Megacrypter.com decrypter plugin"""
     __license__     = "GPLv3"

@@ -7,11 +7,12 @@ from module.plugins.internal.SimpleCrypter import SimpleCrypter, create_getInfo
 class XFSCrypter(SimpleCrypter):
     __name__    = "XFSCrypter"
     __type__    = "crypter"
-    __version__ = "0.17"
+    __version__ = "0.18"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
-    __config__  = [("use_premium"          , "bool", "Use premium account if available"   , True),
+    __config__  = [("activated"            , "bool", "Activated"                          , True),
+                   ("use_premium"          , "bool", "Use premium account if available"   , True),
                    ("use_subfolder"        , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_package", "bool", "Create a subfolder for each package", True)]
 
@@ -49,7 +50,7 @@ class XFSCrypter(SimpleCrypter):
             if self.account:
                 account      = self.account
             else:
-                account_name = (self.__name__ + ".py").replace("Folder.py", "").replace(".py", "")
+                account_name = self.classname.rstrip("Folder")
                 account      = self.pyload.accountManager.getAccountPlugin(account_name)
 
             if account and hasattr(account, "PLUGIN_DOMAIN") and account.PLUGIN_DOMAIN:

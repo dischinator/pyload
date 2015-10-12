@@ -10,6 +10,7 @@ class UptoboxCom(XFSHoster):
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?(uptobox|uptostream)\.com/\w{12}'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Uptobox.com hoster plugin"""
     __license__     = "GPLv3"

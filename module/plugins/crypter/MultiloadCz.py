@@ -11,7 +11,8 @@ class MultiloadCz(Crypter):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:[^/]*\.)?multiload\.cz/(stahnout|slozka)/.+'
-    __config__  = [("use_subfolder"     , "bool", "Save package to subfolder"           , True),
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_subfolder"     , "bool", "Save package to subfolder"           , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package" , True),
                    ("usedHoster"        , "str" , "Prefered hoster list (bar-separated)", ""  ),
                    ("ignoredHoster"     , "str" , "Ignored hoster list (bar-separated)" , ""  )]

@@ -14,6 +14,7 @@ class YadiSk(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'https?://yadi\.sk/d/[\w\-]+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Yadi.sk hoster plugin"""
     __license__     = "GPLv3"

@@ -13,7 +13,8 @@ class MultiHoster(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
-    __config__  = [("use_premium"     , "bool", "Use premium account if available"          , True),
+    __config__  = [("activated"       , "bool", "Activated"                                 , True),
+                   ("use_premium"     , "bool", "Use premium account if available"          , True),
                    ("fallback_premium", "bool", "Fallback to free download if premium fails", True),
                    ("chk_filesize"    , "bool", "Check file size"                           , True),
                    ("revertfailed"    , "bool", "Revert to standard download if fails"      , True)]
@@ -30,7 +31,7 @@ class MultiHoster(SimpleHoster):
 
 
     def init(self):
-        self.PLUGIN_NAME = self.pyload.pluginManager.hosterPlugins[self.__name__]['name']
+        self.PLUGIN_NAME = self.pyload.pluginManager.hosterPlugins[self.classname]['name']
 
 
     def _log(self, level, plugintype, pluginname, messages):
@@ -48,7 +49,7 @@ class MultiHoster(SimpleHoster):
 
     def prepare(self):
         #@TODO: Recheck in 0.4.10
-        plugin = self.pyload.pluginManager.hosterPlugins[self.__name__]
+        plugin = self.pyload.pluginManager.hosterPlugins[self.classname]
         name   = plugin['name']
         module = plugin['module']
         klass  = getattr(module, name)
@@ -104,9 +105,9 @@ class MultiHoster(SimpleHoster):
                 self.log_warning(_("Premium download failed"))
                 self.restart(premium=False)
 
-            elif self.get_config("revertfailed", True) \
-                 and "new_module" in self.pyload.pluginManager.hosterPlugins[self.__name__]:
-                hdict = self.pyload.pluginManager.hosterPlugins[self.__name__]
+            elif self.get_config("revertfailed", True) and \
+                 self.pyload.pluginManager.hosterPlugins[self.classname].get('new_module'):
+                hdict = self.pyload.pluginManager.hosterPlugins[self.classname]
 
                 tmp_module = hdict['new_module']
                 tmp_name   = hdict['new_name']
