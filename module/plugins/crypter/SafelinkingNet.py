@@ -16,7 +16,8 @@ class SafelinkingNet(Crypter):
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?safelinking\.net/([pd])/\w+'
-    __config__  = [("use_subfolder"     , "bool", "Save package to subfolder"          , True),
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]
 
     __description__ = """Safelinking.net decrypter plugin"""
@@ -34,7 +35,7 @@ class SafelinkingNet(Crypter):
 
             header = self.load(url, just_header=True)
             if 'location' in header:
-                self.urls = [header['location']]
+                self.urls = [header.get('location')]
             else:
                 self.error(_("Couldn't find forwarded Link"))
 

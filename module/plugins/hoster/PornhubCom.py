@@ -12,6 +12,7 @@ class PornhubCom(Hoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?pornhub\.com/view_video\.php\?viewkey=\w+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Pornhub.com hoster plugin"""
     __license__     = "GPLv3"

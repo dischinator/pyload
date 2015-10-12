@@ -10,6 +10,7 @@ class TinyurlCom(SimpleCrypter):
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?(preview\.)?tinyurl\.com/[\w\-]+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Tinyurl.com decrypter plugin"""
     __license__     = "GPLv3"

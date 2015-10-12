@@ -10,7 +10,8 @@ class FreeWayMe(MultiHoster):
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?free-way\.(bz|me)/.+'
-    __config__  = [("use_premium" , "bool", "Use premium account if available"    , True),
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_premium" , "bool", "Use premium account if available"    , True),
                    ("revertfailed", "bool", "Revert to standard download if fails", True)]
 
     __description__ = """FreeWayMe multi-hoster plugin"""
@@ -38,13 +39,13 @@ class FreeWayMe(MultiHoster):
                                just_header=True)
 
             if 'location' in header:
-                headers = self.load(header['location'], just_header=True)
+                headers = self.load(header.get('location'), just_header=True)
                 if headers['code'] == 500:
                     #: Error on 2nd stage
                     self.log_error(_("Error [stage2]"))
                 else:
                     #: Seems to work..
-                    self.download(header['location'])
+                    self.download(header.get('location'))
                     break
             else:
                 #: Error page first stage

@@ -12,6 +12,7 @@ class NosuploadCom(XFSHoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?nosupload\.com/\?d=\w{12}'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Nosupload.com hoster plugin"""
     __license__     = "GPLv3"

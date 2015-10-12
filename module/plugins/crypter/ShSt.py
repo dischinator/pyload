@@ -13,6 +13,7 @@ class ShSt(Crypter):
     __status__  = "testing"
 
     __pattern__ = r'http://sh\.st/\w+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Sh.St decrypter plugin"""
     __license__     = "GPLv3"
@@ -27,5 +28,5 @@ class ShSt(Crypter):
         self.req.http.c.setopt(pycurl.USERAGENT, "curl/7.42.1")
         #: Fetch the target URL
         header = self.load(self.pyfile.url, just_header = True, decode = False)
-        target_url = header['location']
+        target_url = header.get('location')
         self.urls.append(target_url)

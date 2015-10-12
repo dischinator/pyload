@@ -21,6 +21,7 @@ class FilecryptCc(Crypter):
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?filecrypt\.cc/Container/\w+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Filecrypt.cc decrypter plugin"""
     __license__     = "GPLv3"

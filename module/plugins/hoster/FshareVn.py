@@ -27,7 +27,8 @@ class FshareVn(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?fshare\.vn/file/.+'
-    __config__  = [("use_premium", "bool", "Use premium account if available", True)]
+    __config__  = [("activated", "bool", "Activated", True),
+                   ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """FshareVn hoster plugin"""
     __license__     = "GPLv3"

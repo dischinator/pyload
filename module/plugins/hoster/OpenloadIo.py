@@ -14,6 +14,7 @@ class OpenloadIo(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?openload\.(co|io)/(f|embed)/(?P<ID>[\w\-]+)'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Openload.co hoster plugin"""
     __license__     = "GPLv3"

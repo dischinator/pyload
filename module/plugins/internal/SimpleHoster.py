@@ -9,18 +9,19 @@ import time
 from module.network.HTTPRequest import BadHeader
 from module.network.RequestFactory import getURL as get_url
 from module.plugins.internal.Hoster import Hoster, create_getInfo, parse_fileInfo
-from module.plugins.internal.Plugin import Fail, encode, parse_name, parse_time, replace_patterns, seconds_to_midnight, set_cookie, set_cookies
-from module.utils import fixup, fs_encode, parseFileSize as parse_size
+from module.plugins.internal.Plugin import Fail, encode, parse_name, parse_size, parse_time, replace_patterns, seconds_to_midnight, set_cookie, set_cookies
+from module.utils import fixup, fs_encode
 
 
 class SimpleHoster(Hoster):
     __name__    = "SimpleHoster"
     __type__    = "hoster"
-    __version__ = "1.97"
+    __version__ = "1.98"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
-    __config__  = [("use_premium"     , "bool", "Use premium account if available"          , True),
+    __config__  = [("activated"       , "bool", "Activated"                                 , True),
+                   ("use_premium"     , "bool", "Use premium account if available"          , True),
                    ("fallback_premium", "bool", "Fallback to free download if premium fails", True),
                    ("chk_filesize"    , "bool", "Check file size"                           , True)]
 
@@ -223,7 +224,7 @@ class SimpleHoster(Hoster):
                 self.LINK_PREMIUM_PATTERN = self.LINK_PATTERN
 
         if self.LEECH_HOSTER:
-            pattern = self.pyload.pluginManager.hosterPlugins[self.__name__]['pattern']
+            pattern = self.pyload.pluginManager.hosterPlugins[self.classname]['pattern']
             if self.__pattern__ is not pattern and re.match(self.__pattern__, self.pyfile.url) is None:
                 self.leech_dl = True
 
@@ -270,7 +271,7 @@ class SimpleHoster(Hoster):
             if not self.link and not self.last_download:
                 self.preload()
 
-                if 'status' not in self.info or self.info['status'] is 3:  #@TODO: Recheck in 0.4.10
+                if self.info.get('status', 3) is 3:  #@TODO: Recheck in 0.4.10
                     self.check_info()
 
                 if self.premium and (not self.CHECK_TRAFFIC or self.check_traffic()):
@@ -333,13 +334,16 @@ class SimpleHoster(Hoster):
             elif self.DL_LIMIT_PATTERN and re.search(self.DL_LIMIT_PATTERN, self.html):
                 m = re.search(self.DL_LIMIT_PATTERN, self.html)
                 try:
-                    errmsg = m.group(1).strip()
+                    errmsg = m.group(1)
 
                 except (AttributeError, IndexError):
-                    errmsg = m.group(0).strip()
+                    errmsg = m.group(0)
 
-                self.info['error'] = re.sub(r'<.*?>', " ", errmsg)
-                self.log_warning(self.info['error'])
+                finally:
+                    errmsg = re.sub(r'<.*?>', " ", errmsg.strip())
+
+                self.info['error'] = errmsg
+                self.log_warning(errmsg)
 
                 wait_time = parse_time(errmsg)
                 self.wait(wait_time, reconnect=wait_time > 300)
@@ -357,8 +361,11 @@ class SimpleHoster(Hoster):
                 except (AttributeError, IndexError):
                     errmsg = m.group(0).strip()
 
-                self.info['error'] = re.sub(r'<.*?>', " ", errmsg)
-                self.log_warning(self.info['error'])
+                finally:
+                    errmsg = re.sub(r'<.*?>', " ", errmsg)
+
+                self.info['error'] = errmsg
+                self.log_warning(errmsg)
 
                 if re.search('limit|wait|slot', errmsg, re.I):
                     wait_time = parse_time(errmsg)
@@ -458,11 +465,9 @@ class SimpleHoster(Hoster):
 
         name   = self.pyfile.name
         size   = self.pyfile.size
-        folder = self.info['folder'] = name
 
         self.log_info(_("File name: ") + name)
         self.log_info(_("File size: %s bytes") % size if size > 0 else _("File size: Unknown"))
-        # self.log_info("File folder: " + folder)
 
 
     #@TODO: Rewrite in 0.4.10

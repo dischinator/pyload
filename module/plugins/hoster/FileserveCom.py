@@ -4,11 +4,10 @@ import re
 
 from module.common.json_layer import json_loads
 from module.network.RequestFactory import getURL as get_url
-from module.plugins.internal.Hoster import Hoster
-from module.plugins.internal.Plugin import chunks
 from module.plugins.captcha.ReCaptcha import ReCaptcha
+from module.plugins.internal.Hoster import Hoster
+from module.plugins.internal.Plugin import chunks, parse_size
 from module.plugins.internal.SimpleHoster import seconds_to_midnight
-from module.utils import parseFileSize as parse_size
 
 
 def check_file(plugin, urls):
@@ -38,6 +37,7 @@ class FileserveCom(Hoster):
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?fileserve\.com/file/(?P<ID>[^/]+)'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Fileserve.com hoster plugin"""
     __license__     = "GPLv3"

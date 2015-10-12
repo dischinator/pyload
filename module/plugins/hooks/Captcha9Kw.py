@@ -8,10 +8,10 @@ import time
 from base64 import b64encode
 
 from module.network.HTTPRequest import BadHeader
-from module.plugins.internal.Hook import Hook, threaded
+from module.plugins.internal.Addon import Addon, threaded
 
 
-class Captcha9Kw(Hook):
+class Captcha9Kw(Addon):
     __name__    = "Captcha9Kw"
     __type__    = "hook"
     __version__ = "0.30"

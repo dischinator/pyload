@@ -13,6 +13,7 @@ class FiledropperCom(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?filedropper\.com/\w+'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Filedropper.com hoster plugin"""
     __license__     = "GPLv3"

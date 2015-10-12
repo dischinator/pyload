@@ -13,6 +13,7 @@ class FileboomMe(SimpleHoster):
     __status__  = "testing"
 
     __pattern__ = r'https?://f(?:ile)?boom\.me/file/(?P<ID>\w+)'
+    __config__  = [("activated", "bool", "Activated", True)]
 
     __description__ = """Fileboom.me hoster plugin"""
     __license__     = "GPLv3"

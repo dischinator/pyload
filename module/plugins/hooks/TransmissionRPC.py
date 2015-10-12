@@ -42,7 +42,7 @@ class TransmissionRPC(Addon):
 
     def send_to_transmission(self, url):
         transmission_rpc_url = self.get_config('rpc_url')
-        client_request_id = self.__name__ + "".join(random.choice('0123456789ABCDEF') for _i in xrange(4))
+        client_request_id = self.classname + "".join(random.choice('0123456789ABCDEF') for _i in xrange(4))
         req = get_request()
 
         try:

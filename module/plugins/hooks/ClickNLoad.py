@@ -37,7 +37,7 @@ class ClickNLoad(Addon):
                   ("extern"   , "bool"           , "Listen for external connections", True       ),
                   ("dest"     , "queue;collector", "Add packages to"                , "collector")]
 
-    __description__ = """Click'n'Load hook plugin"""
+    __description__ = """Click'n'Load support"""
     __license__     = "GPLv3"
     __authors__     = [("RaNaN"         , "RaNaN@pyload.de"  ),
                        ("Walter Purcaro", "vuolter@gmail.com")]

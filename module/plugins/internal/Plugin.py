@@ -6,6 +6,7 @@ import datetime
 import inspect
 import os
 import re
+import sys
 import time
 import traceback
 import urllib
@@ -17,17 +18,38 @@ if os.name is not "nt":
     import grp
     import pwd
 
+from module.common.json_layer import json_dumps, json_loads
 from module.plugins.Plugin import Abort, Fail, Reconnect, Retry, SkipDownload as Skip  #@TODO: Remove in 0.4.10
-from module.utils import fs_encode, fs_decode, html_unescape, parseFileSize as parse_size, save_join as fs_join
+from module.utils import (fs_encode, fs_decode, get_console_encoding, html_unescape,
+                          parseFileSize as parse_size, save_join as fs_join)
 
 
 #@TODO: Move to utils in 0.4.10
-def decode(string, encoding='utf8'):
-    """ Decode string to unicode with utf8 """
+def isiterable(obj):
+    return hasattr(obj, "__iter__")
+
+
+#@TODO: Move to utils in 0.4.10
+def decode(string, encoding=None):
+    """Encoded string (default to UTF-8) -> unicode string"""
     if type(string) is str:
-        return string.decode(encoding, "replace")
+        try:
+            res = unicode(string, encoding or "utf-8")
+
+        except UnicodeDecodeError, e:
+            if encoding:
+                raise UnicodeDecodeError(e)
+
+            encoding = get_console_encoding(sys.stdout.encoding)
+            res = unicode(string, encoding)
+
+    elif type(string) is unicode:
+        res = string
+
     else:
-        return unicode(string)
+        res = unicode(string)
+
+    return res
 
 
 #@TODO: Remove in 0.4.10
@@ -36,12 +58,18 @@ def _decode(*args, **kwargs):
 
 
 #@TODO: Move to utils in 0.4.10
-def encode(string, encoding='utf8'):
-    """ Decode string to utf8 """
+def encode(string, encoding=None, decoding=None):
+    """Unicode or decoded string -> encoded string (default to UTF-8)"""
     if type(string) is unicode:
-        return string.encode(encoding, "replace")
+        res = string.encode(encoding or "utf-8")
+
+    elif type(string) is str:
+        res = encode(decode(string, decoding), encoding)
+
     else:
-        return str(string)
+        res = str(string)
+
+    return res
 
 
 #@TODO: Move to utils in 0.4.10
@@ -108,15 +136,14 @@ def str2int(string):
 
 def parse_time(string):
     if re.search("da(il)?y|today", string):
-        time = seconds_to_midnight()
+        seconds = seconds_to_midnight()
 
     else:
-        regex = re.compile(r'(\d+| (?:this|an?) )\s*(hr|hour|min|sec|)', re.I)
-        time = sum((int(v) if v.strip() not in ("this", "a", "an") else 1) *
-                   {'hr': 3600, 'hour': 3600, 'min': 60, 'sec': 1, '': 1}[u.lower()]
-                   for v, u in regex.findall(string))
-
-    return time
+        regex   = re.compile(r'(\d+| (?:this|an?) )\s*(hr|hour|min|sec|)', re.I)
+        seconds = sum((int(v) if v.strip() not in ("this", "a", "an") else 1) *
+                      {'hr': 3600, 'hour': 3600, 'min': 60, 'sec': 1, '': 1}[u.lower()]
+                      for v, u in regex.findall(string))
+    return seconds
 
 
 #@TODO: Move to utils in 0.4.10
@@ -186,11 +213,11 @@ def parse_html_tag_attr_value(attr_name, tag):
 
 def parse_html_form(attr_str, html, input_names={}):
     for form in re.finditer(r"(?P<TAG><form[^>]*%s[^>]*>)(?P<CONTENT>.*?)</?(form|body|html)[^>]*>" % attr_str,
-                            html, re.S | re.I):
+                            html, re.I | re.S):
         inputs = {}
         action = parse_html_tag_attr_value("action", form.group('TAG'))
 
-        for inputtag in re.finditer(r'(<(input|textarea)[^>]*>)([^<]*(?=</\2)|)', form.group('CONTENT'), re.S | re.I):
+        for inputtag in re.finditer(r'(<(input|textarea)[^>]*>)([^<]*(?=</\2)|)', form.group('CONTENT'), re.I | re.S):
             name = parse_html_tag_attr_value("name", inputtag.group(1))
             if name:
                 value = parse_html_tag_attr_value("value", inputtag.group(1))
@@ -234,7 +261,7 @@ def chunks(iterable, size):
 class Plugin(object):
     __name__    = "Plugin"
     __type__    = "plugin"
-    __version__ = "0.52"
+    __version__ = "0.57"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
@@ -252,7 +279,12 @@ class Plugin(object):
 
     def __repr__(self):
         return "<%(type)s %(name)s>" % {'type': self.__type__.capitalize(),
-                                        'name': self.__name__}
+                                        'name': self.classname}
+
+
+    @property
+    def classname(self):
+        return self.__class__.__name__
 
 
     def _init(self, core):
@@ -281,36 +313,46 @@ class Plugin(object):
     def log_debug(self, *args, **kwargs):
         self._log("debug", self.__type__, self.__name__, args)
         if self.pyload.debug and kwargs.get('trace'):
+            frame = inspect.currentframe()
             print "Traceback (most recent call last):"
-            traceback.print_stack()
+            traceback.print_stack(frame.f_back)
+            del frame
 
 
     def log_info(self, *args, **kwargs):
         self._log("info", self.__type__, self.__name__, args)
         if self.pyload.debug and kwargs.get('trace'):
+            frame = inspect.currentframe()
             print "Traceback (most recent call last):"
-            traceback.print_stack()
+            traceback.print_stack(frame.f_back)
+            del frame
 
 
     def log_warning(self, *args, **kwargs):
         self._log("warning", self.__type__, self.__name__, args)
         if self.pyload.debug and kwargs.get('trace'):
+            frame = inspect.currentframe()
             print "Traceback (most recent call last):"
-            traceback.print_stack()
+            traceback.print_stack(frame.f_back)
+            del frame
 
 
     def log_error(self, *args, **kwargs):
         self._log("error", self.__type__, self.__name__, args)
-        if kwargs.get('trace'):
+        if self.pyload.debug and kwargs.get('trace', True):
+            frame = inspect.currentframe()
             print "Traceback (most recent call last):"
-            traceback.print_stack()
+            traceback.print_stack(frame.f_back)
+            del frame
 
 
     def log_critical(self, *args, **kwargs):
         self._log("critical", self.__type__, self.__name__, args)
         if kwargs.get('trace', True):
+            frame = inspect.currentframe()
             print "Traceback (most recent call last):"
-            traceback.print_stack()
+            traceback.print_stack(frame.f_back)
+            del frame
 
 
     def set_permissions(self, path):
@@ -338,12 +380,6 @@ class Plugin(object):
             self.log_warning(_("Setting owner and group failed"), e)
 
 
-    def get_chunk_count(self):
-        if self.chunk_limit <= 0:
-            return self.pyload.config.get("download", "chunks")
-        return min(self.pyload.config.get("download", "chunks"), self.chunk_limit)
-
-
     def set_config(self, option, value, plugin=None):
         """
         Set config value for current plugin
@@ -352,7 +388,7 @@ class Plugin(object):
         :param value:
         :return:
         """
-        self.pyload.api.setConfigValue(plugin or self.__name__, option, value, section="plugin")
+        self.pyload.api.setConfigValue(plugin or self.classname, option, value, section="plugin")
 
 
     def get_config(self, option, default="", plugin=None):
@@ -363,7 +399,7 @@ class Plugin(object):
         :return:
         """
         try:
-            return self.pyload.config.getPlugin(plugin or self.__name__, option)
+            return self.pyload.config.getPlugin(plugin or self.classname, option)
 
         except KeyError:
             self.log_debug("Config option `%s` not found, use default `%s`" % (option, default or None))  #@TODO: Restore to `log_warning` in 0.4.10
@@ -374,21 +410,36 @@ class Plugin(object):
         """
         Saves a value persistently to the database
         """
-        self.pyload.db.setStorage(self.__name__, key, value)
+        value = map(decode, value) if isiterable(value) else decode(value)
+        entry = json_dumps(value).encode('base64')
+        self.pyload.db.setStorage(self.classname, key, entry)
 
 
-    def retrieve(self, key, default=None):
+    def retrieve(self, key=None, default=None):
         """
         Retrieves saved value or dict of all saved entries if key is None
         """
-        return self.pyload.db.getStorage(self.__name__, key) or default
+        entry = self.pyload.db.getStorage(self.classname, key)
+
+        if key:
+            if entry is None:
+                value = default
+            else:
+                value = json_loads(entry.decode('base64'))
+        else:
+            if not entry:
+                value = default
+            else:
+                value = dict((k, json_loads(v.decode('base64'))) for k, v in value.items())
+
+        return value
 
 
     def delete(self, key):
         """
         Delete entry in db
         """
-        self.pyload.db.delStorage(self.__name__, key)
+        self.pyload.db.delStorage(self.classname, key)
 
 
     def fail(self, msg):
@@ -419,7 +470,7 @@ class Plugin(object):
         url = fixurl(url, unquote=True)  #: Recheck in 0.4.10
 
         if req is None:
-            req = self.req or self.pyload.requestFactory.getRequest(self.__name__)
+            req = self.req or self.pyload.requestFactory.getRequest(self.classname)
 
         #@TODO: Move to network in 0.4.10
         if isinstance(cookies, list):
@@ -456,13 +507,13 @@ class Plugin(object):
             frame = inspect.currentframe()
 
             try:
-                framefile = fs_join("tmp", self.__name__, "%s_line%s.dump.html" % (frame.f_back.f_code.co_name, frame.f_back.f_lineno))
+                framefile = fs_join("tmp", self.classname, "%s_line%s.dump.html" %
+                                    (frame.f_back.f_code.co_name, frame.f_back.f_lineno))
 
-                if not exists(os.path.join("tmp", self.__name__)):
-                    os.makedirs(os.path.join("tmp", self.__name__))
+                if not exists(os.path.join("tmp", self.classname)):
+                    os.makedirs(os.path.join("tmp", self.classname))
 
                 with open(framefile, "wb") as f:
-
                     f.write(encode(html))
 
             except IOError, e:
@@ -487,10 +538,11 @@ class Plugin(object):
                 value = value.strip()
 
                 if key in header:
-                    if type(header[key]) is list:
-                        header[key].append(value)
+                    header_key = header.get(key)
+                    if type(header_key) is list:
+                        header_key.append(value)
                     else:
-                        header[key] = [header[key], value]
+                        header[key] = [header_key, value]
                 else:
                     header[key] = value
 

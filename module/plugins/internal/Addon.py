@@ -23,7 +23,7 @@ def threaded(fn):
 class Addon(Plugin):
     __name__    = "Addon"
     __type__    = "hook"  #@TODO: Change to `addon` in 0.4.10
-    __version__ = "0.11"
+    __version__ = "0.13"
     __status__  = "testing"
 
     __threaded__ = []  #@TODO: Remove in 0.4.10
@@ -53,16 +53,10 @@ class Addon(Plugin):
 
         #: Callback of periodical job task, used by HookManager
         self.cb       = None
-        self.interval = None
+        self.interval = self.PERIODICAL_INTERVAL
 
         self.init()
         self.init_events()
-
-
-    #@TODO: Remove in 0.4.10
-    def _log(self, level, plugintype, pluginname, messages):
-        plugintype = "addon" if plugintype is "hook" else plugintype
-        return super(Addon, self)._log(level, plugintype, pluginname, messages)
 
 
     def init_events(self):
@@ -132,6 +126,14 @@ class Addon(Plugin):
         raise NotImplementedError
 
 
+    def save_info(self):
+        self.store("info", self.info)
+
+
+    def restore_info(self):
+        self.retrieve("info", self.info)
+
+
     @property
     def activated(self):
         """
@@ -154,6 +156,7 @@ class Addon(Plugin):
 
     #: Deprecated method, use `deactivate` instead (Remove in 0.4.10)
     def unload(self, *args, **kwargs):
+        self.save_info()
         return self.deactivate(*args, **kwargs)
 
 
@@ -166,6 +169,7 @@ class Addon(Plugin):
 
     #: Deprecated method, use `activate` instead (Remove in 0.4.10)
     def coreReady(self, *args, **kwargs):
+        self.restore_info()
         return self.activate(*args, **kwargs)
 
 
