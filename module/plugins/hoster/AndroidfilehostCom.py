@@ -11,11 +11,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class AndroidfilehostCom(SimpleHoster):
     __name__    = "AndroidfilehostCom"
     __type__    = "hoster"
-    __version__ = "0.02"
+    __version__ = "0.03"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?androidfilehost\.com/\?fid=\d+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Androidfilehost.com hoster plugin"""

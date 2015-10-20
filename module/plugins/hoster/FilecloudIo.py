@@ -2,7 +2,7 @@
 
 import re
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.captcha.ReCaptcha import ReCaptcha
 from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 
@@ -10,11 +10,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class FilecloudIo(SimpleHoster):
     __name__    = "FilecloudIo"
     __type__    = "hoster"
-    __version__ = "0.11"
+    __version__ = "0.12"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?(?:filecloud\.io|ifile\.it|mihd\.net)/(?P<ID>\w+)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Filecloud.io hoster plugin"""
@@ -71,7 +71,7 @@ class FilecloudIo(SimpleHoster):
         json_url = "http://filecloud.io/download-request.json"
         res = self.load(json_url, post=data)
         self.log_debug(res)
-        res = json_loads(res)
+        res = json.loads(res)
 
         if "error" in res and res['error']:
             self.fail(res)
@@ -84,7 +84,7 @@ class FilecloudIo(SimpleHoster):
             json_url = "http://filecloud.io/download-request.json"
             res = self.load(json_url, post=data)
             self.log_debug(res)
-            res = json_loads(res)
+            res = json.loads(res)
 
             if "retry" in res and res['retry']:
                 self.retry_captcha()
@@ -114,7 +114,7 @@ class FilecloudIo(SimpleHoster):
         rep = self.load("http://api.filecloud.io/api-fetch_download_url.api",
                         post={'akey': akey, 'ukey': ukey})
         self.log_debug("FetchDownloadUrl: " + rep)
-        rep = json_loads(rep)
+        rep = json.loads(rep)
         if rep['status'] == "ok":
             self.link = rep['download_url']
         else:

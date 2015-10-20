@@ -5,10 +5,10 @@ import re
 from module.plugins.internal.Addon import Addon
 
 
-class XFileSharingPro(Addon):
-    __name__    = "XFileSharingPro"
+class XFileSharing(Addon):
+    __name__    = "XFileSharing"
     __type__    = "hook"
-    __version__ = "0.44"
+    __version__ = "0.46"
     __status__  = "testing"
 
     __config__ = [("activated"       , "bool", "Activated"                     , True ),
@@ -18,14 +18,14 @@ class XFileSharingPro(Addon):
                   ("hoster_list"     , "str" , "Hoster list (comma separated)" , ""   ),
                   ("crypter_list"    , "str" , "Crypter list (comma separated)", ""   )]
 
-    __description__ = """Load XFileSharingPro based hosters and crypters which don't need a own plugin to run"""
+    __description__ = """Load XFileSharing based hosters and crypters which don't need a own plugin to run"""
     __license__     = "GPLv3"
     __authors__     = [("Walter Purcaro", "vuolter@gmail.com")]
 
 
-    regexp     = {'hoster' : (r'https?://(?:www\.)?(?:\w+\.)*?(?P<DOMAIN>(?:[\d.]+|[\w\-^_]{3,}(?:\.[a-zA-Z]{2,}){1,2})(?:\:\d+)?)/(?:embed-)?\w{12}(?:\W|$)',
+    regexp     = {'hoster' : (r'https?://(?:www\.)?(?:\w+\.)*(?P<DOMAIN>(?:[\d.]+|[\w\-^_]{3,63}(?:\.[a-zA-Z]{2,}){1,2})(?:\:\d+)?)/(?:embed-)?\w{12}(?:\W|$)',
                               r'https?://(?:[^/]+\.)?(?P<DOMAIN>%s)/(?:embed-)?\w+'),
-                  'crypter': (r'https?://(?:www\.)?(?:\w+\.)*?(?P<DOMAIN>(?:[\d.]+|[\w\-^_]{3,}(?:\.[a-zA-Z]{2,}){1,2})(?:\:\d+)?)/(?:user|folder)s?/\w+',
+                  'crypter': (r'https?://(?:www\.)?(?:\w+\.)*(?P<DOMAIN>(?:[\d.]+|[\w\-^_]{3,63}(?:\.[a-zA-Z]{2,}){1,2})(?:\:\d+)?)/(?:user|folder)s?/\w+',
                               r'https?://(?:[^/]+\.)?(?P<DOMAIN>%s)/(?:user|folder)s?/\w+')}
 
     BUILTIN_HOSTERS  = [#WORKING HOSTERS:
@@ -53,8 +53,8 @@ class XFileSharingPro(Addon):
     def load_pattern(self):
         use_builtin_list = self.get_config('use_builtin_list')
 
-        for type, plugin in (("hoster",  "XFileSharingPro"),
-                             ("crypter", "XFileSharingProFolder")):
+        for type, plugin in (("hoster",  "XFileSharing"),
+                             ("crypter", "XFileSharingFolder")):
             every_plugin = not self.get_config("use_%s_list" % type)
 
             if every_plugin:
@@ -99,14 +99,14 @@ class XFileSharingPro(Addon):
 
     def deactivate(self):
         # self.unload_hoster("BasePlugin")
-        for type, plugin in (("hoster",  "XFileSharingPro"),
-                             ("crypter", "XFileSharingProFolder")):
+        for type, plugin in (("hoster",  "XFileSharing"),
+                             ("crypter", "XFileSharingFolder")):
             self._unload(type, plugin)
 
 
     def unload_hoster(self, hoster):
         hdict = self.pyload.pluginManager.hosterPlugins[hoster]
-        if "new_name" in hdict and hdict['new_name'] == "XFileSharingPro":
+        if "new_name" in hdict and hdict['new_name'] == "XFileSharing":
             if "module" in hdict:
                 hdict.pop('module', None)
 
@@ -124,5 +124,5 @@ class XFileSharingPro(Addon):
            # and pyfile.hasStatus("failed") \
            # and not self.get_config('use_hoster_list') \
            # and self.unload_hoster("BasePlugin"):
-            # self.log_debug("Unloaded XFileSharingPro from BasePlugin")
+            # self.log_debug("Unloaded XFileSharing from BasePlugin")
             # pyfile.setStatus("queued")

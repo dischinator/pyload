@@ -3,7 +3,7 @@
 import re
 import time
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.internal.Plugin import timestamp
 from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 
@@ -16,11 +16,11 @@ def convert_decimal_prefix(m):
 class UlozTo(SimpleHoster):
     __name__    = "UlozTo"
     __type__    = "hoster"
-    __version__ = "1.16"
+    __version__ = "1.17"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?(uloz\.to|ulozto\.(cz|sk|net)|bagruj\.cz|zachowajto\.pl)/(?:live/)?(?P<ID>\w+/[^/?]*)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Uloz.to hoster plugin"""
@@ -75,7 +75,7 @@ class UlozTo(SimpleHoster):
             xapca = xapca.replace('sound":"', 'sound":"http:').replace('image":"', 'image":"http:')
             self.log_debug("xapca: %s" % xapca)
 
-            data = json_loads(xapca)
+            data = json.loads(xapca)
             captcha_value = self.captcha.decrypt(data['image'])
             self.log_debug("CAPTCHA HASH: " + data['hash'], "CAPTCHA SALT: %s" % data['salt'], "CAPTCHA VALUE: " + captcha_value)
 

@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from module.plugins.hoster.UnibytesCom import UnibytesCom
-from module.plugins.internal.SimpleHoster import create_getInfo
+from module.plugins.hoster.UnibytesCom import UnibytesCom, create_getInfo
 
 
 class Share4WebCom(UnibytesCom):
     __name__    = "Share4WebCom"
     __type__    = "hoster"
-    __version__ = "0.13"
+    __version__ = "0.14"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?share4web\.com/get/\w+'

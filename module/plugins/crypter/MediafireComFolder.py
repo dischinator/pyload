@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 
 import re
-from module.plugins.internal.Crypter import Crypter
+
+from module.plugins.internal.Crypter import Crypter, create_getInfo
 from module.plugins.hoster.MediafireCom import checkHTMLHeader
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 
 
 class MediafireComFolder(Crypter):
-    __name__    = "MediafireCom"
+    __name__    = "MediafireComFolder"
     __type__    = "crypter"
-    __version__ = "0.16"
+    __version__ = "0.18"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?mediafire\.com/(folder/|\?sharekey=|\?\w{13}($|[/#]))'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"         , "bool", "Activated"                          , True),
                    ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]
 
@@ -44,7 +45,7 @@ class MediafireComFolder(Crypter):
                     folder_key = m.group(1)
                     self.log_debug("FOLDER KEY: %s" % folder_key)
 
-                    json_resp = json_loads(self.load("http://www.mediafire.com/api/folder/get_info.php",
+                    json_resp = json.loads(self.load("http://www.mediafire.com/api/folder/get_info.php",
                                                      get={'folder_key'     : folder_key,
                                                           'response_format': "json",
                                                           'version'        : 1}))
@@ -58,3 +59,6 @@ class MediafireComFolder(Crypter):
             self.offline()
         else:
             self.urls.append(url)
+
+
+getInfo = create_getInfo(MediafireComFolder)

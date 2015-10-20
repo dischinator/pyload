@@ -2,17 +2,17 @@
 
 import re
 
-from module.plugins.internal.Crypter import Crypter
+from module.plugins.internal.Crypter import Crypter, create_getInfo
 
 
 class FileserveComFolder(Crypter):
-    __name__    = "FileserveCom"
+    __name__    = "FileserveComFolder"
     __type__    = "crypter"
-    __version__ = "0.13"
+    __version__ = "0.15"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?fileserve\.com/list/\w+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"         , "bool", "Activated"                          , True),
                    ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]
 
@@ -38,3 +38,6 @@ class FileserveComFolder(Crypter):
 
         if new_links:
             self.urls = [map(lambda s: "http://fileserve.com%s" % s, new_links)]
+
+
+getInfo = create_getInfo(FileserveComFolder)

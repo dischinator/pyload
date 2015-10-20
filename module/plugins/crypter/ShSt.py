@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from module.plugins.internal.Crypter import Crypter
+import re
 
 import pycurl
-import re
+
+from module.plugins.internal.Crypter import Crypter, create_getInfo
 
 
 class ShSt(Crypter):
     __name__    = "ShSt"
     __type__    = "crypter"
-    __version__ = "0.05"
+    __version__ = "0.06"
     __status__  = "testing"
 
     __pattern__ = r'http://sh\.st/\w+'
@@ -30,3 +31,6 @@ class ShSt(Crypter):
         header = self.load(self.pyfile.url, just_header = True, decode = False)
         target_url = header.get('location')
         self.urls.append(target_url)
+
+
+getInfo = create_getInfo(ShSt)

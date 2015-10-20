@@ -3,7 +3,7 @@
 import re
 import time
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.captcha.ReCaptcha import ReCaptcha
 from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 
@@ -11,11 +11,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class FilepostCom(SimpleHoster):
     __name__    = "FilepostCom"
     __type__    = "hoster"
-    __version__ = "0.36"
+    __version__ = "0.37"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?(?:filepost\.com/files|fp\.io)/(?P<ID>[^/]+)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Filepost.com hoster plugin"""
@@ -81,7 +81,7 @@ class FilepostCom(SimpleHoster):
 
 
     def get_json_response(self, get_dict, post_dict, field):
-        res = json_loads(self.load('https://filepost.com/files/get/', get=get_dict, post=post_dict))
+        res = json.loads(self.load('https://filepost.com/files/get/', get=get_dict, post=post_dict))
 
         self.log_debug(res)
 

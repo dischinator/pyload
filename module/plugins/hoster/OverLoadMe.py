@@ -3,15 +3,14 @@
 import re
 import urllib
 
-from module.common.json_layer import json_loads
 from module.plugins.internal.MultiHoster import MultiHoster, create_getInfo
-from module.plugins.internal.Plugin import parse_size
+from module.plugins.internal.utils import json, parse_size
 
 
 class OverLoadMe(MultiHoster):
     __name__    = "OverLoadMe"
     __type__    = "hoster"
-    __version__ = "0.14"
+    __version__ = "0.15"
     __status__  = "testing"
 
     __pattern__ = r'https?://.*overload\.me/.+'
@@ -34,7 +33,7 @@ class OverLoadMe(MultiHoster):
                           get={'auth': data['password'],
                                'link': pyfile.url})
 
-        data = json_loads(page)
+        data = json.loads(page)
 
         self.log_debug(data)
 

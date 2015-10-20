@@ -4,13 +4,13 @@ from module.plugins.internal.SimpleCrypter import SimpleCrypter, create_getInfo
 
 
 class GoogledriveComFolder(SimpleCrypter):
-    __name__    = "GoogledriveCom"
+    __name__    = "GoogledriveComFolder"
     __type__    = "crypter"
-    __version__ = "0.03"
+    __version__ = "0.05"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?drive\.google\.com/folderview\?.*id=\w+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"         , "bool", "Activated"                          , True),
                    ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]
 

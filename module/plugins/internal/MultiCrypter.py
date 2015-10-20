@@ -6,7 +6,7 @@ from module.plugins.internal.SimpleCrypter import SimpleCrypter
 class MultiCrypter(SimpleCrypter):
     __name__    = "MultiCrypter"
     __type__    = "hoster"
-    __version__ = "0.04"
+    __version__ = "0.06"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
@@ -25,7 +25,5 @@ class MultiCrypter(SimpleCrypter):
 
 
     def _log(self, level, plugintype, pluginname, messages):
-        return super(MultiCrypter, self)._log(level,
-                                              plugintype,
-                                              pluginname,
-                                              (self.PLUGIN_NAME,) + messages)
+        messages = (self.PLUGIN_NAME,) + messages
+        return super(MultiCrypter, self)._log(level, plugintype, pluginname, messages)

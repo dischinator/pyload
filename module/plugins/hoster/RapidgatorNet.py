@@ -3,7 +3,7 @@
 import pycurl
 import re
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.network.HTTPRequest import BadHeader
 from module.plugins.captcha.AdsCaptcha import AdsCaptcha
 from module.plugins.captcha.ReCaptcha import ReCaptcha
@@ -14,11 +14,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class RapidgatorNet(SimpleHoster):
     __name__    = "RapidgatorNet"
     __type__    = "hoster"
-    __version__ = "0.36"
+    __version__ = "0.37"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?(rapidgator\.net|rg\.to)/file/\w+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Rapidgator.net hoster plugin"""
@@ -65,13 +65,13 @@ class RapidgatorNet(SimpleHoster):
 
     def api_response(self, cmd):
         try:
-            json = self.load('%s/%s' % (self.API_URL, cmd),
+            html = self.load('%s/%s' % (self.API_URL, cmd),
                              get={'sid': self.sid,
                                   'url': self.pyfile.url})
-            self.log_debug("API:%s" % cmd, json, "SID: %s" % self.sid)
-            json = json_loads(json)
-            status = json['response_status']
-            msg = json['response_details']
+            self.log_debug("API:%s" % cmd, html, "SID: %s" % self.sid)
+            jso = json.loads(html)
+            status = jso['response_status']
+            msg = jso['response_details']
 
         except BadHeader, e:
             self.log_error("API: %s" % cmd, e, "SID: %s" % self.sid)
@@ -79,7 +79,7 @@ class RapidgatorNet(SimpleHoster):
             msg = e
 
         if status == 200:
-            return json['response']
+            return jso['response']
 
         elif status == 423:
             self.account.empty()
@@ -156,7 +156,7 @@ class RapidgatorNet(SimpleHoster):
         if not res.startswith('{'):
             self.retry()
         self.log_debug(url, res)
-        return json_loads(res)
+        return json.loads(res)
 
 
 getInfo = create_getInfo(RapidgatorNet)

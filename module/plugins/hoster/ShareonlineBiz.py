@@ -12,11 +12,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class ShareonlineBiz(SimpleHoster):
     __name__    = "ShareonlineBiz"
     __type__    = "hoster"
-    __version__ = "0.60"
+    __version__ = "0.61"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?(share-online\.biz|egoshare\.com)/(download\.php\?id=|dl/)(?P<ID>\w+)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Shareonline.biz hoster plugin"""
@@ -38,12 +38,10 @@ class ShareonlineBiz(SimpleHoster):
 
     @classmethod
     def api_info(cls, url):
-        info = super(ShareonlineBiz, cls).api_info(url)
-
+        info  = {}
         field = get_url("http://api.share-online.biz/linkcheck.php",
                         get={'md5'  : "1",
                              'links': re.match(cls.__pattern__, url).group("ID")}).split(";")
-
         try:
             if field[1] == "OK":
                 info['fileid'] = field[0]

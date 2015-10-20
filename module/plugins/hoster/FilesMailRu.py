@@ -33,7 +33,7 @@ def get_info(urls):
 class FilesMailRu(Hoster):
     __name__    = "FilesMailRu"
     __type__    = "hoster"
-    __version__ = "0.35"
+    __version__ = "0.36"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?files\.mail\.ru/.+'
@@ -105,9 +105,7 @@ class FilesMailRu(Hoster):
         #: so i set it to check every download because sometimes there are downloads
         #: that contain the HTML-Text and 60MB ZEROs after that in a xyzfile.part1.rar file
         #: (Loading 100MB in to ram is not an option)
-        check = self.check_file({'html': "<meta name="}, read_size=50000)
-        if check == "html":
-            self.log_info(_(
-                "There was HTML Code in the Downloaded File (%s)...redirect error? The Download will be restarted." %
-                self.pyfile.name))
+        if self.check_file({'html': "<meta name="}, read_size=50000) is "html":
+            self.log_info(_("There was HTML Code in the Downloaded File (%s)...redirect error? The Download will be restarted." %
+                          self.pyfile.name))
             self.retry()

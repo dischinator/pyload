@@ -4,7 +4,7 @@ import pycurl
 import re
 import time
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.captcha.ReCaptcha import ReCaptcha
 from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 
@@ -12,11 +12,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class RapiduNet(SimpleHoster):
     __name__    = "RapiduNet"
     __type__    = "hoster"
-    __version__ = "0.10"
+    __version__ = "0.11"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?rapidu\.net/(?P<ID>\d{10})'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Rapidu.net hoster plugin"""
@@ -78,7 +78,7 @@ class RapiduNet(SimpleHoster):
 
         self.log_debug(res)
 
-        return json_loads(res)
+        return json.loads(res)
 
 
 getInfo = create_getInfo(RapiduNet)

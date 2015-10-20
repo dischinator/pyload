@@ -5,7 +5,7 @@
 
 import re
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.internal.Hoster import Hoster
 from module.plugins.captcha.ReCaptcha import ReCaptcha
 
@@ -13,7 +13,7 @@ from module.plugins.captcha.ReCaptcha import ReCaptcha
 class OboomCom(Hoster):
     __name__    = "OboomCom"
     __type__    = "hoster"
-    __version__ = "0.39"
+    __version__ = "0.40"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?oboom\.com/(?:#(?:id=|/)?)?(?P<ID>\w{8})'
@@ -50,7 +50,7 @@ class OboomCom(Hoster):
     def load_url(self, url, get=None):
         if get is None:
             get = {}
-        return json_loads(self.load(url, get))
+        return json.loads(self.load(url, get))
 
 
     def get_file_id(self, url):

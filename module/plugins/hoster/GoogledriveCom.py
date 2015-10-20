@@ -7,17 +7,17 @@ import re
 import urlparse
 
 from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
-from module.utils import html_unescape
+from module.plugins.internal.utils import html_unescape
 
 
 class GoogledriveCom(SimpleHoster):
     __name__    = "GoogledriveCom"
     __type__    = "hoster"
-    __version__ = "0.14"
+    __version__ = "0.16"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?(drive|docs)\.google\.com/(file/d/\w+|uc\?.*id=)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Drive.google.com hoster plugin"""
@@ -45,12 +45,12 @@ class GoogledriveCom(SimpleHoster):
                 return
 
             link = self.fixurl(link, "https://docs.google.com/")
-            direct_link = self.direct_link(link, False)
+            dl   = self.isdownload(link, redirect=False)
 
-            if not direct_link:
+            if not dl:
                 self.html = self.load(link)
             else:
-                self.link = direct_link
+                self.link = dl
                 break
 
 

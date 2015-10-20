@@ -6,8 +6,8 @@ from module.plugins.internal.Hoster import Hoster, create_getInfo
 class DeadHoster(Hoster):
     __name__    = "DeadHoster"
     __type__    = "hoster"
-    __version__ = "0.19"
-    __status__  = "testing"
+    __version__ = "0.20"
+    __status__  = "stable"
 
     __pattern__ = r'^unmatchable$'
     __config__  = [("activated", "bool", "Activated", True)]

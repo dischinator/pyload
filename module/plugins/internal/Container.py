@@ -6,14 +6,13 @@ import os
 import re
 
 from module.plugins.internal.Crypter import Crypter
-from module.plugins.internal.Plugin import exists
-from module.utils import save_join as fs_join
+from module.plugins.internal.utils import encode, exists, fs_join
 
 
 class Container(Crypter):
     __name__    = "Container"
     __type__    = "container"
-    __version__ = "0.07"
+    __version__ = "0.08"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
@@ -55,7 +54,7 @@ class Container(Crypter):
             self.pyfile.url = fs_join(self.pyload.config.get("general", "download_folder"), self.pyfile.name)
             try:
                 with open(self.pyfile.url, "wb") as f:
-                    f.write(content)
+                    f.write(encode(content))
 
             except IOError, e:
                 self.fail(e)
@@ -79,4 +78,4 @@ class Container(Crypter):
         try:
             os.remove(self.pyfile.url)
         except OSError, e:
-            self.log_warning(_("Error removing: %s") % self.pyfile.url, e)
+            self.log_warning(_("Error removing `%s`") % self.pyfile.url, e)
