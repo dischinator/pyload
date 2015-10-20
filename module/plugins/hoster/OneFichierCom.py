@@ -9,11 +9,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class OneFichierCom(SimpleHoster):
     __name__    = "OneFichierCom"
     __type__    = "hoster"
-    __version__ = "0.93"
+    __version__ = "0.94"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?(?:\w+\.)?(?P<HOST>1fichier\.com|alterupload\.com|cjoint\.net|d(es)?fichiers\.com|dl4free\.com|megadl\.fr|mesfichiers\.org|piecejointe\.net|pjointe\.com|tenvoi\.com)(?:/\?\w+)?'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """1fichier.com hoster plugin"""
@@ -76,25 +76,9 @@ class OneFichierCom(SimpleHoster):
 
         else:
             info = {'status' : 8,
-                    'error'    : _("Too many redirects")}
+                    'error'  : _("Too many redirects")}
 
         return info
-
-
-    def handle_direct(self, pyfile):
-        redirect = pyfile.url
-        for i in xrange(self.get_config("maxredirs", plugin="UserAgentSwitcher")):
-
-            headers = self.load(redirect, just_header=True)
-            if 'location' in headers and headers['location']:
-                self.log_debug("Redirect #%d to: %s" % (i, redirect))
-                redirect = headers['location']
-            else:
-                if 'content-type' in headers and headers['content-type'] == "application/octet-stream":
-                    self.link = pyfile.url
-                break
-        else:
-            self.fail(_("Too many redirects"))
 
 
     def handle_free(self, pyfile):
@@ -114,7 +98,7 @@ class OneFichierCom(SimpleHoster):
 
 
     def handle_premium(self, pyfile):
-        self.download(pyfile.url, post={'dl': "Download", 'did': 0})
+        self.download(pyfile.url, post={'did': 0, 'dl_no_ssl': "on"})
 
 
 getInfo = create_getInfo(OneFichierCom)

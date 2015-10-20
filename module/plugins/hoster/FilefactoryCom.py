@@ -21,11 +21,11 @@ def get_info(urls):
 class FilefactoryCom(SimpleHoster):
     __name__    = "FilefactoryCom"
     __type__    = "hoster"
-    __version__ = "0.59"
+    __version__ = "0.60"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?filefactory\.com/(file|trafficshare/\w+)/\w+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Filefactory.com hoster plugin"""
@@ -63,8 +63,10 @@ class FilefactoryCom(SimpleHoster):
 
 
     def check_download(self):
-        check = self.check_file({'multiple': "You are currently downloading too many files at once.",
-                                    'error'   : '<div id="errorMessage">'})
+        check = self.check_file({
+            'multiple': "You are currently downloading too many files at once.",
+            'error'   : '<div id="errorMessage">'
+        })
 
         if check == "multiple":
             self.log_debug("Parallel downloads detected; waiting 15 minutes")

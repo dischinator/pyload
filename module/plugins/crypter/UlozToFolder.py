@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import re
-from module.plugins.internal.Crypter import Crypter
+
+from module.plugins.internal.Crypter import Crypter, create_getInfo
 
 
 class UlozToFolder(Crypter):
-    __name__    = "UlozTo"
+    __name__    = "UlozToFolder"
     __type__    = "crypter"
-    __version__ = "0.22"
+    __version__ = "0.24"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?(uloz\.to|ulozto\.(cz|sk|net)|bagruj\.cz|zachowajto\.pl)/(m|soubory)/.+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"         , "bool", "Activated"                          , True),
                    ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]
 
@@ -46,3 +47,6 @@ class UlozToFolder(Crypter):
 
         if new_links:
             self.urls = [map(lambda s: "http://ulozto.net/%s" % s, new_links)]
+
+
+getInfo = create_getInfo(UlozToFolder)

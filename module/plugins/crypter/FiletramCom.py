@@ -6,11 +6,11 @@ from module.plugins.internal.SimpleCrypter import SimpleCrypter, create_getInfo
 class FiletramCom(SimpleCrypter):
     __name__    = "FiletramCom"
     __type__    = "crypter"
-    __version__ = "0.04"
+    __version__ = "0.05"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?filetram\.com/[^/]+/.+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"         , "bool", "Activated"                          , True),
                    ("use_premium"       , "bool", "Use premium account if available"   , True),
                    ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]

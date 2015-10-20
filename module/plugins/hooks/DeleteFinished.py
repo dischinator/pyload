@@ -7,7 +7,7 @@ from module.plugins.internal.Addon import Addon
 class DeleteFinished(Addon):
     __name__    = "DeleteFinished"
     __type__    = "hook"
-    __version__ = "1.16"
+    __version__ = "1.17"
     __status__  = "testing"
 
     __config__ = [("activated" , "bool", "Activated"                        , False),
@@ -20,10 +20,6 @@ class DeleteFinished(Addon):
 
 
     PERIODICAL_INTERVAL = 1 * 60 * 60  #: 1 hour
-
-
-    def activate(self):
-        self.start_periodical()
 
 
     def periodical(self):
@@ -43,7 +39,7 @@ class DeleteFinished(Addon):
 
     def activate(self):
         self.info['sleep'] = True
-        self.interval = max(self.PERIODICAL_INTERVAL, self.get_config('interval') * 60 * 60)
+        self.set_interval(self.get_config('interval') * 60 * 60)
         self.add_event('package_finished', self.wakeup)
 
 

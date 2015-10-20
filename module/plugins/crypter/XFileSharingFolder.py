@@ -2,42 +2,42 @@
 
 import re
 
-from module.plugins.internal.XFSHoster import XFSHoster, create_getInfo
+from module.plugins.internal.XFSCrypter import XFSCrypter, create_getInfo
 
 
-class XFileSharingPro(XFSHoster):
-    __name__    = "XFileSharingPro"
-    __type__    = "hoster"
-    __version__ = "0.54"
+class XFileSharingFolder(XFSCrypter):
+    __name__    = "XFileSharingFolder"
+    __type__    = "crypter"
+    __version__ = "0.19"
     __status__  = "testing"
 
-    __pattern__ = r'https?://(?:www\.)?(?:\w+\.)*?(?P<DOMAIN>(?:[\d.]+|[\w\-^_]{3,}(?:\.[a-zA-Z]{2,}){1,2})(?:\:\d+)?)/(?:embed-)?\w{12}(?:\W|$)'
-    __config__  = [("activated", "bool", "Activated", True)]
+    # __pattern__ = r'https?://(?:www\.)?(?:\w+\.)*(?P<DOMAIN>(?:[\d.]+|[\w\-^_]{3,63}(?:\.[a-zA-Z]{2,}){1,2})(?:\:\d+)?)/(?:user|folder)s?/\w+'
+    __pattern__ = r'^unmatchable$'
+    __config__  = [("activated"         , "bool", "Activated"                          , True),
+                   ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
+                   ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]
 
-    __description__ = """XFileSharingPro dummy hoster plugin for hook"""
+    __description__ = """XFileSharing dummy folder decrypter plugin for hook"""
     __license__     = "GPLv3"
     __authors__     = [("Walter Purcaro", "vuolter@gmail.com")]
 
 
-    URL_REPLACEMENTS = [("/embed-", "/")]
-
-
     def _log(self, level, plugintype, pluginname, messages):
-        return super(XFileSharingPro, self)._log(level,
-                                                 plugintype,
-                                                 "%s: %s" % (pluginname, self.PLUGIN_NAME),
-                                                 messages)
+        messages = (self.PLUGIN_NAME,) + messages
+        return super(XFileSharingFolder, self)._log(level, plugintype, pluginname, messages)
 
 
     def init(self):
-        self.__pattern__ = self.pyload.pluginManager.hosterPlugins[self.classname]['pattern']
+        super(XFileSharingFolder, self).init()
+
+        self.__pattern__ = self.pyload.pluginManager.crypterPlugins[self.classname]['pattern']
 
         self.PLUGIN_DOMAIN = re.match(self.__pattern__, self.pyfile.url).group("DOMAIN").lower()
         self.PLUGIN_NAME   = "".join(part.capitalize() for part in re.split(r'(\.|\d+|-)', self.PLUGIN_DOMAIN) if part != '.')
 
 
     def _setup(self):
-        account_name     = self.classname if self.account.PLUGIN_DOMAIN is None else self.PLUGIN_NAME
+        account_name     = self.classname if not self.account or self.account.PLUGIN_DOMAIN is None else self.PLUGIN_NAME
         self.chunk_limit = 1
         self.multiDL     = True
 
@@ -72,4 +72,4 @@ class XFileSharingPro(XFSHoster):
                 self.account = False
 
 
-getInfo = create_getInfo(XFileSharingPro)
+getInfo = create_getInfo(XFileSharingFolder)

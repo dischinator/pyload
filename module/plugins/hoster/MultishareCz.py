@@ -9,11 +9,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class MultishareCz(SimpleHoster):
     __name__    = "MultishareCz"
     __type__    = "hoster"
-    __version__ = "0.43"
+    __version__ = "0.44"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?multishare\.cz/stahnout/(?P<ID>\d+)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """MultiShare.cz hoster plugin"""
@@ -41,7 +41,7 @@ class MultishareCz(SimpleHoster):
     def handle_multi(self, pyfile):
         self.html = self.load('http://www.multishare.cz/html/mms_ajax.php', post={'link': pyfile.url})
 
-        self.check_info()
+        self.update_info()
 
         if not self.check_traffic():
             self.fail(_("Not enough credit left to download file"))

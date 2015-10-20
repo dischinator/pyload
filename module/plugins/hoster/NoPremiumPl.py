@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.internal.MultiHoster import MultiHoster
 
 
 class NoPremiumPl(MultiHoster):
     __name__    = "NoPremiumPl"
     __type__    = "hoster"
-    __version__ = "0.05"
+    __version__ = "0.06"
     __status__  = "testing"
 
     __pattern__ = r'https?://direct\.nopremium\.pl.+'
@@ -70,7 +70,7 @@ class NoPremiumPl(MultiHoster):
             self.temp_offline("Query error #1")
 
         try:
-            parsed = json_loads(data)
+            parsed = json.loads(data)
 
         except Exception:
             self.temp_offline("Data not found")

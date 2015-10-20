@@ -3,14 +3,14 @@
 import re
 import urllib
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.internal.MultiHoster import MultiHoster, create_getInfo
 
 
 class MegaDebridEu(MultiHoster):
     __name__    = "MegaDebridEu"
     __type__    = "hoster"
-    __version__ = "0.50"
+    __version__ = "0.51"
     __status__  = "testing"
 
     __pattern__ = r'http://((?:www\d+\.|s\d+\.)?mega-debrid\.eu|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/download/file/[\w^_]+'
@@ -34,7 +34,7 @@ class MegaDebridEu(MultiHoster):
         user, info = self.account.select()
         jsonResponse = self.load(self.API_URL,
                                  get={'action': 'connectUser', 'login': user, 'password': info['login']['password']})
-        res = json_loads(jsonResponse)
+        res = json.loads(jsonResponse)
 
         if res['response_code'] == "ok":
             self.token = res['token']
@@ -55,7 +55,7 @@ class MegaDebridEu(MultiHoster):
                                  get={'action': 'getLink', 'token': self.token},
                                  post={'link': pyfile.url})
 
-        res = json_loads(jsonResponse)
+        res = json.loads(jsonResponse)
         if res['response_code'] == "ok":
             self.link = res['debridLink'][1:-1]
 

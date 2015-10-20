@@ -7,13 +7,13 @@ import shutil
 import time
 
 from module.plugins.internal.Addon import Addon
-from module.utils import fs_encode, save_join as fs_join
+from module.plugins.internal.utils import encode, fs_join
 
 
 class HotFolder(Addon):
     __name__    = "HotFolder"
     __type__    = "hook"
-    __version__ = "0.19"
+    __version__ = "0.20"
     __status__  = "testing"
 
     __config__ = [("activated", "bool", "Activated"              , False      ),
@@ -32,8 +32,8 @@ class HotFolder(Addon):
 
 
     def periodical(self):
-        folder = fs_encode(self.get_config('folder'))
-        file   = fs_encode(self.get_config('file'))
+        folder = encode(self.get_config('folder'))
+        file   = encode(self.get_config('file'))
 
         try:
             if not os.path.isdir(os.path.join(folder, "finished")):

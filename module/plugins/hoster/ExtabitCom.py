@@ -2,7 +2,7 @@
 
 import re
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 
 from module.plugins.captcha.ReCaptcha import ReCaptcha
 from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo, seconds_to_midnight
@@ -11,11 +11,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo, s
 class ExtabitCom(SimpleHoster):
     __name__    = "ExtabitCom"
     __type__    = "hoster"
-    __version__ = "0.68"
+    __version__ = "0.69"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?extabit\.com/(file|go|fid)/(?P<ID>\w+)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Extabit.com hoster plugin"""
@@ -54,7 +54,7 @@ class ExtabitCom(SimpleHoster):
             get_data = {'type': "recaptcha"}
             get_data['capture'], get_data['challenge'] = recaptcha.challenge(captcha_key)
 
-            res = json_loads(self.load("http://extabit.com/file/%s/" % fileID, get=get_data))
+            res = json.loads(self.load("http://extabit.com/file/%s/" % fileID, get=get_data))
 
             if "ok" in res:
                 self.captcha.correct()

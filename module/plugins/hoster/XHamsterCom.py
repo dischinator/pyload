@@ -3,7 +3,7 @@
 import re
 import urllib
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.internal.Hoster import Hoster
 
 
@@ -18,7 +18,7 @@ def clean_json(json_expr):
 class XHamsterCom(Hoster):
     __name__    = "XHamsterCom"
     __type__    = "hoster"
-    __version__ = "0.14"
+    __version__ = "0.15"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?xhamster\.com/movies/.+'
@@ -62,7 +62,7 @@ class XHamsterCom(Hoster):
             self.error(_("flashvar not found"))
 
         j = clean_json(json_flashvar.group(1))
-        flashvars = json_loads(j)
+        flashvars = json.loads(j)
 
         if flashvars['srv']:
             srv_url = flashvars['srv'] + '/'

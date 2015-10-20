@@ -4,15 +4,14 @@ import re
 import time
 import urllib
 
-from module.common.json_layer import json_loads
 from module.plugins.internal.MultiHoster import MultiHoster, create_getInfo
-from module.plugins.internal.Plugin import parse_size
+from module.plugins.internal.utils import json, parse_size
 
 
 class RealdebridCom(MultiHoster):
     __name__    = "RealdebridCom"
     __type__    = "hoster"
-    __version__ = "0.69"
+    __version__ = "0.70"
     __status__  = "testing"
 
     __pattern__ = r'https?://((?:www\.|s\d+\.)?real-debrid\.com/dl/|[\w^_]\.rdb\.so/d/)[\w^_]+'
@@ -30,7 +29,7 @@ class RealdebridCom(MultiHoster):
 
 
     def handle_premium(self, pyfile):
-        data = json_loads(self.load("https://real-debrid.com/ajax/unrestrict.php",
+        data = json.loads(self.load("https://real-debrid.com/ajax/unrestrict.php",
                                     get={'lang'    : "en",
                                          'link'    : pyfile.url,
                                          'password': self.get_password(),

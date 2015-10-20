@@ -10,11 +10,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class GigapetaCom(SimpleHoster):
     __name__    = "GigapetaCom"
     __type__    = "hoster"
-    __version__ = "0.05"
+    __version__ = "0.06"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?gigapeta\.com/dl/\w+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """GigaPeta.com hoster plugin"""

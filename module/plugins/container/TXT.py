@@ -3,13 +3,13 @@
 import codecs
 
 from module.plugins.internal.Container import Container
-from module.utils import fs_encode
+from module.plugins.internal.utils import encode
 
 
 class TXT(Container):
     __name__    = "TXT"
     __type__    = "container"
-    __version__ = "0.17"
+    __version__ = "0.18"
     __status__  = "testing"
 
     __pattern__ = r'.+\.(txt|text)$'
@@ -30,7 +30,7 @@ class TXT(Container):
         except Exception:
             encoding = "utf-8"
 
-        fs_filename = fs_encode(pyfile.url.strip())
+        fs_filename = encode(pyfile.url.strip())
         txt         = codecs.open(fs_filename, 'r', encoding)
         curPack     = "Parsed links from %s" % pyfile.name
         packages    = {curPack:[],}

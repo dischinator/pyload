@@ -5,7 +5,20 @@ import re
 
 from module.PyFile import PyFile
 from module.plugins.internal.Plugin import Plugin
-from module.utils import fs_encode
+from module.plugins.internal.utils import encode
+
+
+def renice(pid, value):
+    if not value or os.name is "nt":
+        return
+
+    try:
+        subprocess.Popen(["renice", str(value), str(pid)],
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE,
+                         bufsize=-1)
+    except Exception:
+        pass
 
 
 class ArchiveError(Exception):
@@ -23,7 +36,7 @@ class PasswordError(Exception):
 class Extractor(Plugin):
     __name__    = "Extractor"
     __type__    = "extractor"
-    __version__ = "0.35"
+    __version__ = "0.38"
     __status__  = "testing"
 
     __description__ = """Base extractor plugin"""
@@ -38,7 +51,7 @@ class Extractor(Plugin):
 
 
     @classmethod
-    def is_archive(cls, filename):
+    def isarchive(cls, filename):
         name = os.path.basename(filename).lower()
         return any(name.endswith(ext) for ext in cls.EXTENSIONS)
 
@@ -62,8 +75,8 @@ class Extractor(Plugin):
         processed = []
 
         for fname, id, fout in files_ids:
-            if cls.is_archive(fname):
-                pname = re.sub(cls.re_multipart, "", fname) if cls.is_multipart(fname) else os.path.splitext(fname)[0]
+            if cls.isarchive(fname):
+                pname = re.sub(cls.re_multipart, "", fname) if cls.ismultipart(fname) else os.path.splitext(fname)[0]
                 if pname not in processed:
                     processed.append(pname)
                     targets.append((fname, id, fout))
@@ -73,15 +86,15 @@ class Extractor(Plugin):
 
     @property
     def target(self):
-        return fs_encode(self.filename)
+        return encode(self.filename)
 
 
     def __init__(self, plugin, filename, out,
                  fullpath=True,
                  overwrite=False,
                  excludefiles=[],
-                 renice=0,
-                 delete='No',
+                 renice=False,
+                 priority=0,
                  keepbroken=False,
                  fid=None):
         """
@@ -95,8 +108,7 @@ class Extractor(Plugin):
         self.fullpath     = fullpath
         self.overwrite    = overwrite
         self.excludefiles = excludefiles
-        self.renice       = renice
-        self.delete       = delete
+        self.priority     = priority
         self.keepbroken   = keepbroken
         self.files        = []  #: Store extracted files here
 
@@ -114,10 +126,8 @@ class Extractor(Plugin):
 
 
     def _log(self, level, plugintype, pluginname, messages):
-        return self.plugin._log(level,
-                                plugintype,
-                                self.plugin.__name__,
-                                (self.__name__,) + messages)
+        messages = (self.__name__,) + messages
+        return self.plugin._log(level, plugintype, self.plugin.__name__, messages)
 
 
     def verify(self, password=None):
