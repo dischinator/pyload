@@ -4,17 +4,17 @@ import re
 import urlparse
 
 from module.plugins.internal.SimpleCrypter import SimpleCrypter, create_getInfo
-import json
+from module.plugins.internal.utils import json
 
 
 class Go4UpCom(SimpleCrypter):
     __name__    = "Go4UpCom"
     __type__    = "crypter"
-    __version__ = "0.14"
+    __version__ = "0.15"
     __status__  = "testing"
 
     __pattern__ = r'http://go4up\.com/(dl/\w{12}|rd/\w{12}/\d+)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"         , "bool", "Activated"                          , True),
                    ("use_premium"       , "bool", "Use premium account if available"   , True),
                    ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True),

@@ -4,10 +4,10 @@ from module.plugins.internal.DeadCrypter import DeadCrypter, create_getInfo
 
 
 class FiredriveComFolder(DeadCrypter):
-    __name__    = "FiredriveCom"
+    __name__    = "FiredriveComFolder"
     __type__    = "crypter"
-    __version__ = "0.04"
-    __status__  = "testing"
+    __version__ = "0.06"
+    __status__  = "stable"
 
     __pattern__ = r'https?://(?:www\.)?(firedrive|putlocker)\.com/share/.+'
     __config__  = []  #@TODO: Remove in 0.4.10

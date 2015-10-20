@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import socket
+import threading
 import time
 
 try:
     import ssl
 except ImportError:
     pass
-
-from threading import Lock
 
 from module.plugins.internal.Addon import Addon, threaded
 
@@ -22,14 +21,13 @@ def forward(source, destination):
             bufdata = source.recv(bufsize)
     finally:
         destination.shutdown(socket.SHUT_WR)
-        #: destination.close()
 
 
 #@TODO: IPv6 support
 class ClickNLoad(Addon):
     __name__    = "ClickNLoad"
     __type__    = "hook"
-    __version__ = "0.48"
+    __version__ = "0.49"
     __status__  = "testing"
 
     __config__ = [("activated", "bool"           , "Activated"                      , True       ),
@@ -51,7 +49,7 @@ class ClickNLoad(Addon):
         webport = self.pyload.config.get("webinterface", "port")
         cnlport = self.get_config('port')
 
-        self.proxy(ip, webport, cnlport)
+        self.pyload.scheduler.addJob(5, self.proxy, [ip, webport, cnlport], threaded=False)
 
 
     @threaded
@@ -69,13 +67,11 @@ class ClickNLoad(Addon):
 
     @threaded
     def proxy(self, ip, webport, cnlport):
-        time.sleep(10)  #@TODO: Remove in 0.4.10 (implement addon delay on startup)
-
         self.log_info(_("Proxy listening on %s:%s") % (ip or "0.0.0.0", cnlport))
 
         self._server(ip, webport, cnlport)
 
-        lock = Lock()
+        lock = threading.Lock()
         lock.acquire()
         lock.acquire()
 

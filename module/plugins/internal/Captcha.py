@@ -6,12 +6,13 @@ import os
 import time
 
 from module.plugins.internal.Plugin import Plugin
+from module.plugins.internal.utils import encode
 
 
 class Captcha(Plugin):
     __name__    = "Captcha"
     __type__    = "captcha"
-    __version__ = "0.46"
+    __version__ = "0.47"
     __status__  = "testing"
 
     __description__ = """Base anti-captcha plugin"""
@@ -36,10 +37,8 @@ class Captcha(Plugin):
 
 
     def _log(self, level, plugintype, pluginname, messages):
-        return self.plugin._log(level,
-                                plugintype,
-                                self.plugin.__name__,
-                                (self.__name__,) + messages)
+        messages = (self.__name__,) + messages
+        return self.plugin._log(level, plugintype, self.plugin.__name__, messages)
 
 
     def recognize(self, image):
@@ -75,7 +74,7 @@ class Captcha(Plugin):
         time_ref = ("%.2f" % time.time())[-6:].replace(".", "")
 
         with open(os.path.join("tmp", "captcha_image_%s_%s.%s" % (self.plugin.__name__, time_ref, input_type)), "wb") as tmp_img:
-            tmp_img.write(data)
+            tmp_img.write(encode(data))
 
         if ocr:
             if isinstance(ocr, basestring):
@@ -94,7 +93,7 @@ class Captcha(Plugin):
 
                 self.task.setWaiting(max(timeout, 50))  #@TODO: Move to `CaptchaManager` in 0.4.10
                 while self.task.isWaiting():
-                    self.plugin.check_abort()
+                    self.plugin.check_status()
                     time.sleep(1)
 
             finally:
@@ -113,7 +112,7 @@ class Captcha(Plugin):
                 os.remove(tmp_img.name)
 
             except OSError, e:
-                self.log_warning(_("Error removing: %s") % tmp_img.name, e)
+                self.log_warning(_("Error removing `%s`") % tmp_img.name, e)
 
         #self.log_info(_("Captcha result: ") + result)  #@TODO: Remove from here?
 
@@ -124,7 +123,7 @@ class Captcha(Plugin):
         if not self.task:
             return
 
-        self.log_error(_("Invalid captcha"))
+        self.log_warning(_("Invalid captcha"))
         self.task.invalid()
 
 

@@ -9,14 +9,13 @@ import time
 from select import select
 
 from module.plugins.internal.Hoster import Hoster
-# from module.utils import decode
-from module.utils import save_join as fs_join
+from module.plugins.internal.utils import fs_join
 
 
 class Xdcc(Hoster):
     __name__    = "Xdcc"
     __type__    = "hoster"
-    __version__ = "0.34"
+    __version__ = "0.35"
     __status__  = "testing"
 
     __config__ = [("nick", "str", "Nickname", "pyload"),
@@ -189,8 +188,8 @@ class Xdcc(Hoster):
 
         self.pyfile.name = packname
 
-        download_folder = self.pyload.config.get("general", "download_folder")
-        filename = fs_join(download_folder, packname)
+        dl_folder = self.pyload.config.get("general", "download_folder")
+        filename = fs_join(dl_folder, packname)
 
         self.log_info(_("Downloading %s from %s:%d") % (packname, ip, port))
 

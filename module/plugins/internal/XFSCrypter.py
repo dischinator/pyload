@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from module.plugins.internal.Plugin import set_cookie
 from module.plugins.internal.SimpleCrypter import SimpleCrypter, create_getInfo
+from module.plugins.internal.utils import set_cookie
 
 
 class XFSCrypter(SimpleCrypter):
     __name__    = "XFSCrypter"
     __type__    = "crypter"
-    __version__ = "0.18"
+    __version__ = "0.20"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
@@ -28,13 +28,13 @@ class XFSCrypter(SimpleCrypter):
     NAME_PATTERN = r'<[Tt]itle>.*?\: (?P<N>.+) folder</[Tt]itle>'
     LINK_PATTERN = r'<(?:td|TD).*?>\s*(?:<.+>\s*)?<a href="(.+?)".*?>.+?(?:</a>)?\s*(?:<.+>\s*)?</(?:td|TD)>'
 
-    OFFLINE_PATTERN      = r'>\s*(No such user|\w+ (Not Found|file (was|has been) removed|no longer available)'
+    OFFLINE_PATTERN      = r'>\s*(No such user|\w+ (Not Found|file (was|has been) removed|no longer available))'
     TEMP_OFFLINE_PATTERN = r'>\s*\w+ server (is in )?(maintenance|maintainance)'
 
 
     def set_xfs_cookie(self):
         if not self.PLUGIN_DOMAIN:
-            self.log_error(_("Unable to set xfs cookie due missing PLUGIN_DOMAIN"))
+            self.log_warning(_("Unable to set xfs cookie due missing PLUGIN_DOMAIN"))
             return
 
         cookie = (self.PLUGIN_DOMAIN, "lang", "english")

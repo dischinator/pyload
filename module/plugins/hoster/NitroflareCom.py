@@ -9,11 +9,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster
 class NitroflareCom(SimpleHoster):
     __name__    = "NitroflareCom"
     __type__    = "hoster"
-    __version__ = "0.15"
+    __version__ = "0.16"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?nitroflare\.com/view/(?P<ID>[\w^_]+)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Nitroflare.com hoster plugin"""

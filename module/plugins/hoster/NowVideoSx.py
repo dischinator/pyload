@@ -8,11 +8,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class NowVideoSx(SimpleHoster):
     __name__    = "NowVideoSx"
     __type__    = "hoster"
-    __version__ = "0.13"
+    __version__ = "0.14"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?nowvideo\.[a-zA-Z]{2,}/(video/|mobile/(#/videos/|.+?id=))(?P<ID>\w+)'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """NowVideo.sx hoster plugin"""

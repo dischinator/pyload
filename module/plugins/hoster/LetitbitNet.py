@@ -9,7 +9,7 @@
 import re
 import urlparse
 
-from module.common.json_layer import json_loads, json_dumps
+from module.plugins.internal.utils import json
 from module.network.RequestFactory import getURL as get_url
 from module.plugins.captcha.ReCaptcha import ReCaptcha
 from module.plugins.internal.SimpleHoster import SimpleHoster, seconds_to_midnight
@@ -18,8 +18,8 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, seconds_to_midnig
 def api_response(url):
     json_data = ["yw7XQy2v9", ["download/info", {'link': url}]]
     api_rep   = get_url("http://api.letitbit.net/json",
-                        post={'r': json_dumps(json_data)})
-    return json_loads(api_rep)
+                        post={'r': json.dumps(json_data)})
+    return json.loads(api_rep)
 
 
 def get_info(urls):
@@ -35,11 +35,11 @@ def get_info(urls):
 class LetitbitNet(SimpleHoster):
     __name__    = "LetitbitNet"
     __type__    = "hoster"
-    __version__ = "0.33"
+    __version__ = "0.34"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?(letitbit|shareflare)\.net/download/.+'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Letitbit.net hoster plugin"""
@@ -108,7 +108,7 @@ class LetitbitNet(SimpleHoster):
             self.wait(seconds_to_midnight(), True)
 
         elif res.startswith('['):
-            urls = json_loads(res)
+            urls = json.loads(res)
 
         elif res.startswith('http://'):
             urls = [res]
@@ -123,9 +123,9 @@ class LetitbitNet(SimpleHoster):
         premium_key = self.account.get_login('password')
 
         json_data = [self.account.user, ["download/direct_links", {'pass': premium_key, 'link': pyfile.url}]]
-        api_rep = self.load('http://api.letitbit.net/json', post={'r': json_dumps(json_data)})
+        api_rep = self.load('http://api.letitbit.net/json', post={'r': json.dumps(json_data)})
         self.log_debug("API Data: " + api_rep)
-        api_rep = json_loads(api_rep)
+        api_rep = json.loads(api_rep)
 
         if api_rep['status'] == "FAIL":
             self.fail(api_rep['data'])

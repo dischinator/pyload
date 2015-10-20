@@ -3,13 +3,13 @@
 import re
 
 from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 
 
 class SoundcloudCom(SimpleHoster):
     __name__    = "SoundcloudCom"
     __type__    = "hoster"
-    __version__ = "0.12"
+    __version__ = "0.13"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?soundcloud\.com/[\w\-]+/[\w\-]+'
@@ -40,7 +40,7 @@ class SoundcloudCom(SimpleHoster):
             client_id = "b45b1aa10f1ac2941910a7f0d10f8e28"
 
         #: Url to retrieve the actual song url
-        streams = json_loads(self.load("https://api.soundcloud.com/tracks/%s/streams" % song_id,
+        streams = json.loads(self.load("https://api.soundcloud.com/tracks/%s/streams" % song_id,
                              get={'client_id': client_id}))
 
         regex = re.compile(r'[^\d]')

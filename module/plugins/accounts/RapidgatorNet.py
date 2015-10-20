@@ -3,13 +3,13 @@
 import urlparse
 
 from module.plugins.internal.Account import Account
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import jso
 
 
 class RapidgatorNet(Account):
     __name__    = "RapidgatorNet"
     __type__    = "account"
-    __version__ = "0.15"
+    __version__ = "0.17"
     __status__  = "testing"
 
     __description__ = """Rapidgator.net account plugin"""
@@ -28,24 +28,23 @@ class RapidgatorNet(Account):
 
         try:
             sid = data.get('sid', None)
-            assert sid
 
             html = self.load(urlparse.urljoin(self.API_URL, "info"),
                              get={'sid': sid})
 
             self.log_debug("API:USERINFO", html)
 
-            json = json_loads(html)
+            jso = json.loads(html)
 
-            if json['response_status'] == 200:
-                if "reset_in" in json['response']:
-                    self._schedule_refresh(user, json['response']['reset_in'])
+            if jso['response_status'] == 200:
+                if "reset_in" in jso['response']:
+                    self._schedule_refresh(user, jso['response']['reset_in'])
 
-                validuntil  = json['response']['expire_date']
-                trafficleft = float(json['response']['traffic_left']) / 1024  #@TODO: Remove `/ 1024` in 0.4.10
+                validuntil  = jso['response']['expire_date']
+                trafficleft = float(jso['response']['traffic_left']) / 1024  #@TODO: Remove `/ 1024` in 0.4.10
                 premium     = True
             else:
-                self.log_error(json['response_details'])
+                self.log_error(jso['response_details'])
 
         except Exception, e:
             self.log_error(e, trace=True)
@@ -64,13 +63,13 @@ class RapidgatorNet(Account):
 
             self.log_debug("API:LOGIN", html)
 
-            json = json_loads(html)
+            jso = json.loads(html)
 
-            if json['response_status'] == 200:
-                data['sid'] = str(json['response']['session_id'])
+            if jso['response_status'] == 200:
+                data['sid'] = str(jso['response']['session_id'])
                 return
             else:
-                self.log_error(json['response_details'])
+                self.log_error(jso['response_details'])
 
         except Exception, e:
             self.log_error(e, trace=True)

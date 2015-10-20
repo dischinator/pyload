@@ -3,14 +3,14 @@
 import re
 import urlparse
 
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 from module.plugins.internal.XFSAccount import XFSAccount
 
 
 class UptoboxCom(XFSAccount):
     __name__    = "UptoboxCom"
     __type__    = "account"
-    __version__ = "0.17"
+    __version__ = "0.18"
     __status__  = "testing"
 
     __description__ = """Uptobox.com account plugin"""
@@ -39,5 +39,5 @@ class UptoboxCom(XFSAccount):
                                'password': password},
                          cookies=self.COOKIES)
 
-        if json_loads(html).get('error'):
+        if json.loads(html).get('error'):
             self.fail_login()

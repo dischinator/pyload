@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from module.plugins.internal.SimpleCrypter import SimpleCrypter, create_getInfo
-from module.common.json_layer import json_loads
+from module.plugins.internal.utils import json
 
 
 class GooGl(SimpleCrypter):
     __name__    = "GooGl"
     __type__    = "crypter"
-    __version__ = "0.04"
+    __version__ = "0.05"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?goo\.gl/([a-zA-Z]+/)?\w+'
@@ -27,7 +27,7 @@ class GooGl(SimpleCrypter):
     def get_links(self):
         rep = self.load(self.API_URL, get={'shortUrl': self.pyfile.url})
         self.log_debug("JSON data: " + rep)
-        rep = json_loads(rep)
+        rep = json.loads(rep)
         return [rep['longUrl']] if "longUrl" in rep else None
 
 

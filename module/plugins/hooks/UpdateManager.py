@@ -10,13 +10,13 @@ import time
 
 from module.plugins.internal.Addon import Expose, Addon, threaded
 from module.plugins.internal.Plugin import exists
-from module.utils import fs_encode, save_join as fs_join
+from module.plugins.internal.utils import encode, fs_join
 
 
 class UpdateManager(Addon):
     __name__    = "UpdateManager"
     __type__    = "hook"
-    __version__ = "1.00"
+    __version__ = "1.03"
     __status__  = "testing"
 
     __config__ = [("activated"    , "bool", "Activated"                                , True ),
@@ -32,11 +32,10 @@ class UpdateManager(Addon):
     __authors__     = [("Walter Purcaro", "vuolter@gmail.com")]
 
 
-    _VERSION = re.compile(r'__version__.*=.*("|\')([\d.]+)')
+    _VERSION = re.compile(r'^\s*__version__\s*=\s*("|\')([\d.]+)\1', re.M)
 
-    SERVER_URL = "http://updatemanager.pyload.org"
-
-    PERIODICAL_INTERVAL = 3 * 60 * 60  #: 3 hours
+    SERVER_URL     = "http://updatemanager.pyload.org"
+    CHECK_INTERVAL = 3 * 60 * 60  #: 3 hours
 
 
     def activate(self):
@@ -66,7 +65,6 @@ class UpdateManager(Addon):
 
     def all_downloads_processed(self):
         if self.do_restart is True:
-            self.log_warning(_("Downloads are done, restarting pyLoad to reload the updated plugins"))
             self.pyload.api.restart()
 
 
@@ -79,7 +77,7 @@ class UpdateManager(Addon):
                 return
 
         if self.get_config('checkperiod') and \
-           time.time() - max(self.PERIODICAL_INTERVAL, self.get_config('checkinterval') * 60 * 60) > self.info['last_check']:
+           time.time() - max(self.CHECK_INTERVAL, self.get_config('checkinterval') * 60 * 60) > self.info['last_check']:
             self.update()
 
 
@@ -129,7 +127,7 @@ class UpdateManager(Addon):
                              get={'v': self.pyload.api.getServerVersion()})
 
         except Exception:
-            self.log_warning(_("Unable to retrieve server to get updates"))
+            self.log_warning(_("Unable to connect to the server to retrieve updates"))
 
         else:
             res = html.splitlines()
@@ -156,7 +154,7 @@ class UpdateManager(Addon):
             self.pyload.api.restart()
         else:
             self.do_restart = True
-            self.log_warning(_("Downloads are active, will restart once the download is done"))
+            self.log_warning(_("pyLoad restart scheduled"), _("Downloads are active, pyLoad restart postponed once the download is done"))
             self.pyload.api.pauseServer()
 
 
@@ -170,11 +168,11 @@ class UpdateManager(Addon):
             exitcode = 0
 
         elif newversion == "None":
-            self.log_info(_("No new pyLoad version available"))
+            self.log_info(_("pyLoad is up to date!"))
             exitcode = self.update_plugins()
 
         else:
-            self.log_info(_("***  New pyLoad Version %s available  ***") % newversion)
+            self.log_info(_("***  New pyLoad %s available  ***") % newversion)
             self.log_info(_("***  Get it here: https://github.com/pyload/pyload/releases  ***"))
             self.info['pyload'] = True
             exitcode = 3
@@ -202,13 +200,13 @@ class UpdateManager(Addon):
             if self.pyload.pluginManager.reloadPlugins(updated):
                 exitcode = 1
             else:
-                self.log_warning(_("You have to restart pyLoad to reload the updated plugins"))
+                self.log_warning(_("You have to restart pyLoad to use the updated plugins"))
                 self.info['plugins'] = True
                 exitcode = 2
 
             self.manager.dispatchEvent("plugin_updated", updated)
         else:
-            self.log_info(_("*** No plugin updates available ***"))
+            self.log_info(_("All plugins are up to date!"))
             exitcode = 0
 
         #: Exit codes:
@@ -233,7 +231,6 @@ class UpdateManager(Addon):
             for line in l:
                 d = dict(zip(schema, line.split('|')))
                 d['name'] = d['name'].rsplit('.py', 1)[0]
-                d['type'] = d['type'].rstrip('s')
                 nl.append(d)
             l[:] = nl
 
@@ -252,6 +249,7 @@ class UpdateManager(Addon):
         updatelist, blacklist = self.parse_list(updates)
 
         url = updates[1]
+        req = self.pyload.requestFactory.getRequest(self.classname)
 
         if blacklist:
             #@NOTE: Protect UpdateManager from self-removing
@@ -283,7 +281,7 @@ class UpdateManager(Addon):
             type    = plugin['type']
             version = plugin['version']
 
-            plugins = getattr(self.pyload.pluginManager, "%sPlugins" % type)
+            plugins = getattr(self.pyload.pluginManager, "%sPlugins" % type.rstrip('s'))  #@TODO: Remove rstrip in 0.4.10
 
             oldver = float(plugins[name]['v']) if name in plugins else None
             newver = float(version)
@@ -295,30 +293,27 @@ class UpdateManager(Addon):
             else:
                 continue
 
-            self.log_info(_(msg) % {'type'  : type.upper(),
+            self.log_info(_(msg) % {'type'  : type.rstrip('s').upper(),  #@TODO: Remove rstrip in 0.4.10
                                     'name'  : name,
                                     'oldver': oldver,
                                     'newver': newver})
             try:
-                content = self.load(url % plugin + ".py", decode=False)
+                content = self.load(url % plugin + ".py", decode=False, req=req)
+
+                if req.code == 404:
+                    raise Exception(_("URL not found"))
+
                 m = self._VERSION.search(content)
-
                 if m and m.group(2) == version:
-                    #@TODO: Remove in 0.4.10
-                    if type in ("account", "hook"):
-                        folder = type + "s"
-                    else:
-                        folder = type
-
-                    with open(fs_join("userplugins", folder, name + ".py"), "wb") as f:
-                        f.write(fs_encode(content))
+                    with open(fs_join("userplugins", type, name + ".py"), "wb") as f:
+                        f.write(encode(content))
 
                     updated.append((type, name))
                 else:
                     raise Exception(_("Version mismatch"))
 
             except Exception, e:
-                self.log_error(_("Error updating plugin: %s %s") % (type.upper(), name), e)
+                self.log_error(_("Error updating plugin: %s %s") % (type.rstrip('s').upper(), name), e)    #@TODO: Remove rstrip in 0.4.10
 
         return updated
 
@@ -347,14 +342,8 @@ class UpdateManager(Addon):
         for type, name in type_plugins:
             rootplugins = os.path.join(pypath, "module", "plugins")
 
-            #@TODO: Remove in 0.4.10
-            if type in ("account", "hook"):
-                folder = type + "s"
-            else:
-                folder = type
-
             for dir in ("userplugins", rootplugins):
-                py_filename  = fs_join(dir, folder, name + ".py")
+                py_filename  = fs_join(dir, type, name + ".py")
                 pyc_filename = py_filename + "c"
 
                 if type is "hook":
@@ -372,7 +361,7 @@ class UpdateManager(Addon):
                         os.remove(filename)
 
                     except OSError, e:
-                        self.log_warning(_("Error removing: %s") % filename, e)
+                        self.log_warning(_("Error removing `%s`") % filename, e)
 
                     else:
                         id = (type, name)

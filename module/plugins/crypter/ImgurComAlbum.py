@@ -1,17 +1,17 @@
 import re
 
 from module.plugins.internal.SimpleCrypter import SimpleCrypter, create_getInfo
-from module.utils import uniqify
+from module.plugins.internal.utils import uniqify
 
 
 class ImgurComAlbum(SimpleCrypter):
     __name__    = "ImgurComAlbum"
     __type__    = "crypter"
-    __version__ = "0.52"
+    __version__ = "0.53"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.|m\.)?imgur\.com/(a|gallery|)/?\w{5,7}'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"         , "bool", "Activated"                          , True),
                    ("use_premium"       , "bool", "Use premium account if available"   , True),
                    ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
                    ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]

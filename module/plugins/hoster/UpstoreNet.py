@@ -9,11 +9,11 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class UpstoreNet(SimpleHoster):
     __name__    = "UpstoreNet"
     __type__    = "hoster"
-    __version__ = "0.07"
+    __version__ = "0.08"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?upstore\.net/'
-    __config__  = [("activated", "bool", "Activated", True),
+    __config__  = [("activated"  , "bool", "Activated"                       , True),
                    ("use_premium", "bool", "Use premium account if available", True)]
 
     __description__ = """Upstore.Net File Download Hoster"""

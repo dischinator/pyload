@@ -4,10 +4,10 @@ from module.plugins.internal.DeadCrypter import DeadCrypter, create_getInfo
 
 
 class SharingmatrixComFolder(DeadCrypter):
-    __name__    = "SharingmatrixCom"
+    __name__    = "SharingmatrixComFolder"
     __type__    = "crypter"
-    __version__ = "0.02"
-    __status__  = "testing"
+    __version__ = "0.04"
+    __status__  = "stable"
 
     __pattern__ = r'http://(?:www\.)?sharingmatrix\.com/folder/\w+'
     __config__  = []  #@TODO: Remove in 0.4.10

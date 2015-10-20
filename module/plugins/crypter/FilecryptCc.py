@@ -9,7 +9,7 @@ import urlparse
 
 from Crypto.Cipher import AES
 
-from module.plugins.internal.Crypter import Crypter
+from module.plugins.internal.Crypter import Crypter, create_getInfo
 from module.plugins.captcha.ReCaptcha import ReCaptcha
 from module.plugins.captcha.SolveMedia import SolveMedia
 
@@ -17,7 +17,7 @@ from module.plugins.captcha.SolveMedia import SolveMedia
 class FilecryptCc(Crypter):
     __name__    = "FilecryptCc"
     __type__    = "crypter"
-    __version__ = "0.20"
+    __version__ = "0.21"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?filecrypt\.cc/Container/\w+'
@@ -210,3 +210,6 @@ class FilecryptCc(Crypter):
         links = filter(bool, text.split('\n'))
 
         return links
+
+
+getInfo = create_getInfo(FilecryptCc)

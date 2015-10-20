@@ -11,13 +11,13 @@ except ImportError:
 
 from module.plugins.internal.Addon import Addon, Expose, threaded
 from module.plugins.internal.Plugin import exists
-from module.utils import fs_encode, save_join as fs_join
+from module.plugins.internal.utils import encode, fs_join
 
 
 class AntiVirus(Addon):
     __name__    = "AntiVirus"
     __type__    = "hook"
-    __version__ = "0.14"
+    __version__ = "0.15"
     __status__  = "testing"
 
     #@TODO: add trash option (use Send2Trash lib)
@@ -39,8 +39,8 @@ class AntiVirus(Addon):
     @Expose
     @threaded
     def scan(self, pyfile, thread):
-        avfile = fs_encode(self.get_config('avfile'))
-        avargs = fs_encode(self.get_config('avargs').strip())
+        avfile = encode(self.get_config('avfile'))
+        avargs = encode(self.get_config('avargs').strip())
 
         if not os.path.isfile(avfile):
             self.fail(_("Antivirus executable not found"))
@@ -48,12 +48,12 @@ class AntiVirus(Addon):
         scanfolder = self.get_config('avtarget') is "folder"
 
         if scanfolder:
-            download_folder = self.pyload.config.get("general", "download_folder")
-            package_folder  = pyfile.package().folder if self.pyload.config.get("general", "folder_per_package") else ""
-            target      = fs_join(download_folder, package_folder, pyfile.name)
-            target_repr = "Folder: " + package_folder or download_folder
+            dl_folder      = self.pyload.config.get("general", "download_folder")
+            package_folder = pyfile.package().folder if self.pyload.config.get("general", "folder_per_package") else ""
+            target      = fs_join(dl_folder, package_folder, pyfile.name)
+            target_repr = "Folder: " + package_folder or dl_folder
         else:
-            target      = fs_encode(pyfile.plugin.last_download)
+            target      = encode(pyfile.plugin.last_download)
             target_repr = "File: " + os.path.basename(pyfile.plugin.last_download)
 
         if not exists(target):
