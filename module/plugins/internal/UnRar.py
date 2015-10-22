@@ -5,13 +5,14 @@ import re
 import string
 import subprocess
 
-from module.plugins.internal.Extractor import Extractor, ArchiveError, CRCError, PasswordError, renice
-from module.plugins.internal.utils import decode, fs_join
+from module.plugins.internal.Extractor import Extractor, ArchiveError, CRCError, PasswordError
+from module.plugins.internal.utils import decode, fs_join, renice
 
 
 class UnRar(Extractor):
     __name__    = "UnRar"
-    __version__ = "1.28"
+    __type__    = "extractor"
+    __version__ = "1.29"
     __status__  = "testing"
 
     __description__ = """Rar extractor plugin"""
@@ -21,8 +22,8 @@ class UnRar(Extractor):
                        ("Immenz"        , "immenz@gmx.net"   )]
 
 
-    CMD        = "unrar"
-    EXTENSIONS = [".rar"]
+    CMD          = "unrar"
+    EXTENSIONS   = [".rar"]
 
     re_multipart = re.compile(r'\.(part|r)(\d+)(?:\.rar)?(\.rev|\.bad)?', re.I)
 

@@ -21,7 +21,7 @@ class Plugin(object):
     __name__    = "Plugin"
     __type__    = "plugin"
     __version__ = "0.59"
-    __status__  = "testing"
+    __status__  = "stable"
 
     __config__  = []  #: [("name", "type", "desc", "default")]
 
@@ -266,7 +266,7 @@ class Plugin(object):
                     f.write(encode(html))
 
             except IOError, e:
-                self.log_error(e, trace=True)
+                self.log_error(e)
 
             finally:
                 del frame  #: Delete the frame or it wont be cleaned

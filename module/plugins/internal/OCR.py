@@ -21,7 +21,7 @@ class OCR(Plugin):
     __name__    = "OCR"
     __type__    = "ocr"
     __version__ = "0.21"
-    __status__  = "testing"
+    __status__  = "stable"
 
     __description__ = """OCR base plugin"""
     __license__     = "GPLv3"
@@ -32,13 +32,6 @@ class OCR(Plugin):
         self._init(plugin.pyload)
         self.plugin = plugin
         self.init()
-
-
-    def init(self):
-        """
-        Initialize additional data structures
-        """
-        pass
 
 
     def _log(self, level, plugintype, pluginname, messages):
@@ -137,7 +130,7 @@ class OCR(Plugin):
                 os.remove(tmpSub.name)
 
         except OSError, e:
-            self.log_warning(e, trace=True)
+            self.log_warning(e)
 
 
     def recognize(self, name):

@@ -5,6 +5,7 @@ from __future__ import with_statement
 import os
 import re
 
+from module.network.HTTPRequest import BadHeader
 from module.plugins.internal.Base import Base, create_getInfo, parse_fileInfo
 from module.plugins.internal.Plugin import Fail, Retry
 from module.plugins.internal.utils import encode, exists, fixurl, fs_join, parse_name
@@ -13,8 +14,8 @@ from module.plugins.internal.utils import encode, exists, fixurl, fs_join, parse
 class Hoster(Base):
     __name__    = "Hoster"
     __type__    = "hoster"
-    __version__ = "0.41"
-    __status__  = "testing"
+    __version__ = "0.44"
+    __status__  = "stable"
 
     __pattern__ = r'^unmatchable$'
     __config__  = [("activated"   , "bool", "Activated"                                 , True),
@@ -126,10 +127,10 @@ class Hoster(Base):
                 location = self.fixurl(header.get('location'), url)
                 code     = header.get('code')
 
-                if code is 302:
+                if code == 302:
                     link = location
 
-                elif code is 301:
+                elif code == 301:
                     url = location
                     if redirect:
                         continue
@@ -222,6 +223,11 @@ class Hoster(Base):
                                             cookies=cookies, chunks=chunks, resume=resume,
                                             progressNotify=self.pyfile.setProgress,
                                             disposition=disposition)
+
+        except BadHeader, e:
+            self.req.code = e.code
+            raise BadHeader(e)
+
         finally:
             self.pyfile.size = self.req.size
 
@@ -233,7 +239,7 @@ class Hoster(Base):
             except OSError, e:
                 self.log_debug(_("Error removing `%s`") % bad_file, e)
 
-            finally:
+            else:
                 return ""
 
         #@TODO: Recheck in 0.4.10

@@ -8,9 +8,9 @@ import time
 import urlparse
 
 from module.plugins.internal.Captcha import Captcha
-from module.plugins.internal.Plugin import (Plugin, Abort, Fail, Reconnect, Retry, Skip,
-                                            decode, encode, fixurl, parse_html_form,
-                                            parse_name, replace_patterns)
+from module.plugins.internal.Plugin import Plugin, Abort, Fail, Reconnect, Retry, Skip
+from module.plugins.internal.utils import (decode, encode, fixurl, format_size, format_time,
+                                           parse_html_form, parse_name, replace_patterns)
 
 
 #@TODO: Remove in 0.4.10
@@ -37,8 +37,8 @@ def create_getInfo(klass):
 class Base(Plugin):
     __name__    = "Base"
     __type__    = "base"
-    __version__ = "0.13"
-    __status__  = "testing"
+    __version__ = "0.17"
+    __status__  = "stable"
 
     __pattern__ = r'^unmatchable$'
     __config__  = [("activated"  , "bool", "Activated"                       , True),
@@ -50,6 +50,24 @@ class Base(Plugin):
 
 
     URL_REPLACEMENTS = []
+
+
+    @classmethod
+    def get_info(cls, url="", html=""):
+        url  = fixurl(url, unquote=True)
+        info = {'name'   : parse_name(url),
+                'pattern': {},
+                'size'   : 0,
+                'status' : 3 if url else 8,
+                'url'    : replace_patterns(url, cls.URL_REPLACEMENTS)}
+
+        try:
+            info['pattern'] = re.match(cls.__pattern__, url).groupdict()
+
+        except Exception:
+            pass
+
+        return info
 
 
     def __init__(self, pyfile):
@@ -65,7 +83,6 @@ class Base(Plugin):
         self.multiDL = True  #@TODO: Change to `multi_dl` in 0.4.10
 
         #: time.time() + wait in seconds
-        self.wait_until = 0
         self.waiting    = False
 
         #: Account handler instance, see :py:class:`Account`
@@ -103,31 +120,7 @@ class Base(Plugin):
              'msg'       : msg})
 
 
-    @classmethod
-    def get_info(cls, url="", html=""):
-        url  = fixurl(url, unquote=True)
-        info = {'name'   : parse_name(url),
-                'pattern': {},
-                'size'   : 0,
-                'status' : 3 if url else 8,
-                'url'    : replace_patterns(url, cls.URL_REPLACEMENTS)}
-
-        try:
-            info['pattern'] = re.match(cls.__pattern__, url).groupdict()
-        except Exception:
-            pass
-
-        return info
-
-
     def init_base(self):
-        pass
-
-
-    def init(self):
-        """
-        Initialize the plugin (in addition to `__init__`)
-        """
         pass
 
 
@@ -166,8 +159,8 @@ class Base(Plugin):
             self.req     = self.pyload.requestFactory.getRequest(self.classname)
             self.premium = False
 
-        self.grab_info()
         self.setup_base()
+        self.grab_info()
         self.setup()
 
 
@@ -206,7 +199,7 @@ class Base(Plugin):
             size = self.pyfile.size
 
         if size:
-            self.log_info(_("Link size: %s bytes") % size)
+            self.log_info(_("Link size: %s (%s bytes)") % (format_size(size), size))
         else:
             self.log_info(_("Link size: N/D"))
 
@@ -336,17 +329,23 @@ class Base(Plugin):
         if reconnect is not None:
             self.set_reconnect(reconnect)
 
+        wait_time = pyfile.waitUntil - time.time()
+
+        if wait_time < 1:
+            self.log_warning(_("Invalid wait time interval"))
+            return
+
         self.waiting = True
 
         status = pyfile.status  #@NOTE: Recheck in 0.4.10
         pyfile.setStatus("waiting")
 
-        self.log_info(_("Waiting %d seconds...") % (pyfile.waitUntil - time.time()))
+        self.log_info(_("Waiting %s...") % format_time(wait_time))
 
         if self.wantReconnect:
             self.log_info(_("Requiring reconnection..."))
             if self.account:
-                self.log_warning("Reconnection ignored due logged account")
+                self.log_warning(_("Reconnection ignored due logged account"))
 
         if not self.wantReconnect or self.account:
             while pyfile.waitUntil > time.time():
