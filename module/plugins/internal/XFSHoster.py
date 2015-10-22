@@ -13,8 +13,8 @@ from module.plugins.internal.utils import html_unescape, seconds_to_midnight
 class XFSHoster(SimpleHoster):
     __name__    = "XFSHoster"
     __type__    = "hoster"
-    __version__ = "0.66"
-    __status__  = "testing"
+    __version__ = "0.68"
+    __status__  = "stable"
 
     __pattern__ = r'^unmatchable$'
     __config__  = [("activated"   , "bool", "Activated"                                 , True),
@@ -29,30 +29,30 @@ class XFSHoster(SimpleHoster):
                        ("Walter Purcaro", "vuolter@gmail.com"  )]
 
 
-    PLUGIN_DOMAIN = None
+    PLUGIN_DOMAIN         = None
 
-    LEECH_HOSTER = True  #@NOTE: hould be set to `False` by default for safe, but I am lazy...
+    LEECH_HOSTER          = True  #@NOTE: hould be set to `False` by default for safe, but I am lazy...
 
-    NAME_PATTERN = r'(Filename[ ]*:[ ]*</b>(</td><td nowrap>)?|name="fname"[ ]+value="|<[\w^_]+ class="(file)?name">)\s*(?P<N>.+?)(\s*<|")'
-    SIZE_PATTERN = r'(Size[ ]*:[ ]*</b>(</td><td>)?|File:.*>|</font>\s*\(|<[\w^_]+ class="size">)\s*(?P<S>[\d.,]+)\s*(?P<U>[\w^_]+)'
+    NAME_PATTERN          = r'(Filename[ ]*:[ ]*</b>(</td><td nowrap>)?|name="fname"[ ]+value="|<[\w^_]+ class="(file)?name">)\s*(?P<N>.+?)(\s*<|")'
+    SIZE_PATTERN          = r'(Size[ ]*:[ ]*</b>(</td><td>)?|File:.*>|</font>\s*\(|<[\w^_]+ class="size">)\s*(?P<S>[\d.,]+)\s*(?P<U>[\w^_]+)'
 
-    OFFLINE_PATTERN      = r'>\s*\w+ (Not Found|file (was|has been) removed|no longer available)'
-    TEMP_OFFLINE_PATTERN = r'>\s*\w+ server (is in )?(maintenance|maintainance)'
+    OFFLINE_PATTERN       = r'>\s*\w+ (Not Found|file (was|has been) removed|no longer available)'
+    TEMP_OFFLINE_PATTERN  = r'>\s*\w+ server (is in )?(maintenance|maintainance)'
 
-    WAIT_PATTERN         = r'<span id="countdown_str".*>(\d+)</span>|id="countdown" value=".*?(\d+).*?"'
-    PREMIUM_ONLY_PATTERN = r'>This file is available for Premium Users only'
-    HAPPY_HOUR_PATTERN   = r'>[Hh]appy hour'
-    ERROR_PATTERN        = r'(?:class=["\']err["\'].*?>|<[Cc]enter><b>|>Error</td>|>\(ERROR:)(?:\s*<.+?>\s*)*(.+?)(?:["\']|<|\))'
+    WAIT_PATTERN          = r'<span id="countdown_str".*>(\d+)</span>|id="countdown" value=".*?(\d+).*?"'
+    PREMIUM_ONLY_PATTERN  = r'>This file is available for Premium Users only'
+    HAPPY_HOUR_PATTERN    = r'>[Hh]appy hour'
+    ERROR_PATTERN         = r'(?:class=["\']err["\'].*?>|<[Cc]enter><b>|>Error</td>|>\(ERROR:)(?:\s*<.+?>\s*)*(.+?)(?:["\']|<|\))'
 
-    LINK_LEECH_PATTERN = r'<h2>Download Link</h2>\s*<textarea[^>]*>([^<]+)'
+    LINK_LEECH_PATTERN    = r'<h2>Download Link</h2>\s*<textarea[^>]*>([^<]+)'
 
     CAPTCHA_PATTERN       = r'(https?://[^"\']+?/captchas?/[^"\']+)'
     CAPTCHA_BLOCK_PATTERN = r'>Enter code.*?<div.*?>(.+?)</div>'
     RECAPTCHA_PATTERN     = None
     SOLVEMEDIA_PATTERN    = None
 
-    FORM_PATTERN    = None
-    FORM_INPUTS_MAP = None  #: Dict passed as `input_names` to `parse_html_form`
+    FORM_PATTERN          = None
+    FORM_INPUTS_MAP       = None  #: Dict passed as `input_names` to `parse_html_form`
 
 
     def setup(self):
@@ -61,13 +61,8 @@ class XFSHoster(SimpleHoster):
         self.resume_download = self.premium
 
 
-    def set_xfs_cookie(self):
-        if not self.PLUGIN_DOMAIN:
-            self.log_warning(_("Unable to set xfs cookie due missing PLUGIN_DOMAIN"))
-            return
-
+    def _set_xfs_cookie(self):
         cookie = (self.PLUGIN_DOMAIN, "lang", "english")
-
         if isinstance(self.COOKIES, list) and cookie not in self.COOKIES:
             self.COOKIES.insert(cookie)
         else:
@@ -75,22 +70,13 @@ class XFSHoster(SimpleHoster):
 
 
     def prepare(self):
-        """
-        Initialize important variables
-        """
-        if not self.PLUGIN_DOMAIN:
-            if self.account:
-                account = self.account
-            else:
-                account = self.pyload.accountManager.getAccountPlugin(self.classname)
-
-            if account and hasattr(account, "PLUGIN_DOMAIN") and account.PLUGIN_DOMAIN:
-                self.PLUGIN_DOMAIN = account.PLUGIN_DOMAIN
-            else:
-                self.fail(_("Missing PLUGIN_DOMAIN"))
+        if not self.PLUGIN_DOMAIN and self.account and self.account.PLUGIN_DOMAIN:
+            self.PLUGIN_DOMAIN = self.account.PLUGIN_DOMAIN
+        else:
+            self.fail(_("Missing PLUGIN_DOMAIN"))
 
         if self.COOKIES:
-            self.set_xfs_cookie()
+            self._set_xfs_cookie()
 
         if not self.LINK_PATTERN:
             pattern = r'(?:file: "(.+?)"|(https?://(?:www\.)?([^/]*?%s|\d+\.\d+\.\d+\.\d+)(\:\d+)?(/d/|(/files)?/\d+/\w+/).+?)["\'<])'
@@ -216,9 +202,8 @@ class XFSHoster(SimpleHoster):
                     wait_time = int(m.group(1))
                     self.set_wait(wait_time)
                     self.set_reconnect(False)
-
-                self.handle_captcha(inputs)
-                self.wait()
+                    self.handle_captcha(inputs)
+                    self.wait()
         else:
             inputs['referer'] = self.pyfile.url
 

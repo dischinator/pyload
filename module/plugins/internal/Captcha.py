@@ -13,7 +13,7 @@ class Captcha(Plugin):
     __name__    = "Captcha"
     __type__    = "captcha"
     __version__ = "0.47"
-    __status__  = "testing"
+    __status__  = "stable"
 
     __description__ = """Base anti-captcha plugin"""
     __license__     = "GPLv3"
@@ -27,13 +27,6 @@ class Captcha(Plugin):
         self.task   = None  #: captchaManager task
 
         self.init()
-
-
-    def init(self):
-        """
-        Initialize additional data structures
-        """
-        pass
 
 
     def _log(self, level, plugintype, pluginname, messages):

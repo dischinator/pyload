@@ -23,7 +23,7 @@ class Addon(Plugin):
     __name__    = "Addon"
     __type__    = "hook"  #@TODO: Change to `addon` in 0.4.10
     __version__ = "0.14"
-    __status__  = "testing"
+    __status__  = "stable"
 
     __threaded__ = []  #@TODO: Remove in 0.4.10
 
@@ -56,6 +56,14 @@ class Addon(Plugin):
 
         self.init()
         self.init_events()
+
+
+    @property
+    def activated(self):
+        """
+        Checks if addon is activated
+        """
+        return self.get_config("activated")
 
 
     #@TODO: Remove in 0.4.10
@@ -122,21 +130,13 @@ class Addon(Plugin):
             self.periodical()
 
         except Exception, e:
-            self.log_error(_("Error executing periodical task: %s") % e, trace=True)
+            self.log_error(_("Error performing periodical task"), e)
 
         self.restart_periodical(threaded=threaded, delay=self.interval)
 
 
     def periodical(self):
         raise NotImplementedError
-
-
-    @property
-    def activated(self):
-        """
-        Checks if addon is activated
-        """
-        return self.get_config("activated")
 
 
     #: Deprecated method, use `activated` property instead (Remove in 0.4.10)

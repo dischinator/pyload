@@ -4,13 +4,14 @@ import os
 import re
 import subprocess
 
-from module.plugins.internal.UnRar import ArchiveError, CRCError, PasswordError, UnRar, renice
-from module.plugins.internal.utils import fs_join
+from module.plugins.internal.UnRar import UnRar, ArchiveError, CRCError, PasswordError
+from module.plugins.internal.utils import fs_join, renice
 
 
 class SevenZip(UnRar):
     __name__    = "SevenZip"
-    __version__ = "0.17"
+    __type__    = "extractor"
+    __version__ = "0.18"
     __status__  = "testing"
 
     __description__ = """7-Zip extractor plugin"""
@@ -19,14 +20,13 @@ class SevenZip(UnRar):
                        ("Michael Nowak" , None               )]
 
 
-    CMD        = "7z"
-    EXTENSIONS = [".7z", ".xz", ".zip", ".gz", ".gzip", ".tgz", ".bz2", ".bzip2",
-                  ".tbz2", ".tbz", ".tar", ".wim", ".swm", ".lzma", ".rar", ".cab",
-                  ".arj", ".z", ".taz", ".cpio", ".rpm", ".deb", ".lzh", ".lha",
-                  ".chm", ".chw", ".hxs", ".iso", ".msi", ".doc", ".xls", ".ppt",
-                  ".dmg", ".xar", ".hfs", ".exe", ".ntfs", ".fat", ".vhd", ".mbr",
-                  ".squashfs", ".cramfs", ".scap"]
-
+    CMD         = "7z"
+    EXTENSIONS  = [".7z", ".xz", ".zip", ".gz", ".gzip", ".tgz", ".bz2", ".bzip2",
+                   ".tbz2", ".tbz", ".tar", ".wim", ".swm", ".lzma", ".rar", ".cab",
+                   ".arj", ".z", ".taz", ".cpio", ".rpm", ".deb", ".lzh", ".lha",
+                   ".chm", ".chw", ".hxs", ".iso", ".msi", ".doc", ".xls", ".ppt",
+                   ".dmg", ".xar", ".hfs", ".exe", ".ntfs", ".fat", ".vhd", ".mbr",
+                   ".squashfs", ".cramfs", ".scap"]
 
     #@NOTE: there are some more uncovered 7z formats
     re_filelist = re.compile(r'([\d\:]+)\s+([\d\:]+)\s+([\w\.]+)\s+(\d+)\s+(\d+)\s+(.+)')

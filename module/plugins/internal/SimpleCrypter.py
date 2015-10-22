@@ -11,7 +11,7 @@ from module.plugins.internal.utils import replace_patterns, set_cookie, set_cook
 class SimpleCrypter(Crypter):
     __name__    = "SimpleCrypter"
     __type__    = "crypter"
-    __version__ = "0.74"
+    __version__ = "0.76"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
@@ -89,7 +89,7 @@ class SimpleCrypter(Crypter):
 
     @classmethod
     def get_info(cls, url="", html=""):
-        info = super(SimpleHoster, cls).get_info(url)
+        info = super(SimpleCrypter, cls).get_info(url)
 
         info.update(cls.api_info(url))
 
@@ -129,19 +129,25 @@ class SimpleCrypter(Crypter):
 
 
     #@TODO: Remove in 0.4.10
-    def _setup(self):
-        orig_name      = self.classname
-        self.classname = orig_name.rstrip("Folder")
-        super(SimpleCrypter, self)._setup()
-        self.classname = orig_name
+    def setup_base(self):
+        class_name = self.classname.rsplit("Folder", 1)[0]
+
+        if self.account:
+            self.req     = self.pyload.requestFactory.getRequest(class_name, self.account.user)
+            self.premium = self.account.info['data']['premium']  #@NOTE: Avoid one unnecessary get_info call by `self.account.premium` here
+        else:
+            self.req     = self.pyload.requestFactory.getRequest(class_name)
+            self.premium = False
+
+        super(SimpleCrypter, self).setup_base()
 
 
     #@TODO: Remove in 0.4.10
     def load_account(self):
-        orig_name      = self.classname
-        self.classname = orig_name.rstrip("Folder")
+        class_name = self.classname
+        self.__class__.__name__ = class_name.rsplit("Folder", 1)[0]
         super(SimpleCrypter, self).load_account()
-        self.classname = orig_name
+        self.__class__.__name__ = class_name
 
 
     def handle_direct(self, pyfile):
