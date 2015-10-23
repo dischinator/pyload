@@ -5,15 +5,14 @@ import re
 
 from module.plugins.captcha.ReCaptcha import ReCaptcha
 from module.plugins.captcha.SolveMedia import SolveMedia
-from module.plugins.internal.Plugin import set_cookie
 from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
-from module.plugins.internal.utils import html_unescape, seconds_to_midnight
+from module.plugins.internal.utils import html_unescape, seconds_to_midnight, set_cookie
 
 
 class XFSHoster(SimpleHoster):
     __name__    = "XFSHoster"
     __type__    = "hoster"
-    __version__ = "0.68"
+    __version__ = "0.70"
     __status__  = "stable"
 
     __pattern__ = r'^unmatchable$'
@@ -31,6 +30,7 @@ class XFSHoster(SimpleHoster):
 
     PLUGIN_DOMAIN         = None
 
+    DIRECT_LINK           = None
     LEECH_HOSTER          = True  #@NOTE: hould be set to `False` by default for safe, but I am lazy...
 
     NAME_PATTERN          = r'(Filename[ ]*:[ ]*</b>(</td><td nowrap>)?|name="fname"[ ]+value="|<[\w^_]+ class="(file)?name">)\s*(?P<N>.+?)(\s*<|")'
@@ -70,10 +70,8 @@ class XFSHoster(SimpleHoster):
 
 
     def prepare(self):
-        if not self.PLUGIN_DOMAIN and self.account and self.account.PLUGIN_DOMAIN:
-            self.PLUGIN_DOMAIN = self.account.PLUGIN_DOMAIN
-        else:
-            self.fail(_("Missing PLUGIN_DOMAIN"))
+        if not self.PLUGIN_DOMAIN:
+            self.fail(_("Missing PLUGIN DOMAIN"))
 
         if self.COOKIES:
             self._set_xfs_cookie()
@@ -98,7 +96,7 @@ class XFSHoster(SimpleHoster):
             if m is not None:
                 break
 
-            data = self.get_post_parameters()
+            data = self._post_parameters()
 
             self.html = self.load(pyfile.url, post=data, redirect=False)
 
@@ -175,7 +173,7 @@ class XFSHoster(SimpleHoster):
             self.link = header.get('location')
 
 
-    def get_post_parameters(self):
+    def _post_parameters(self):
         if self.FORM_PATTERN or self.FORM_INPUTS_MAP:
             action, inputs = self.parse_html_form(self.FORM_PATTERN or "", self.FORM_INPUTS_MAP or {})
         else:
