@@ -10,12 +10,15 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class YibaishiwuCom(SimpleHoster):
     __name__    = "YibaishiwuCom"
     __type__    = "hoster"
-    __version__ = "0.16"
+    __version__ = "0.17"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?(?:u\.)?115\.com/file/(?P<ID>\w+)'
-    __config__  = [("activated"  , "bool", "Activated"                       , True),
-                   ("use_premium", "bool", "Use premium account if available", True)]
+    __config__  = [("activated"   , "bool", "Activated"                                        , True),
+                   ("use_premium" , "bool", "Use premium account if available"                 , True),
+                   ("fallback"    , "bool", "Fallback to free download if premium fails"       , True),
+                   ("chk_filesize", "bool", "Check file size"                                  , True),
+                   ("max_wait"    , "int" , "Reconnect if waiting time is greater than minutes", 10  )]
 
     __description__ = """115.com hoster plugin"""
     __license__     = "GPLv3"

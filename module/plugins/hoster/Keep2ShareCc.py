@@ -10,12 +10,15 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class Keep2ShareCc(SimpleHoster):
     __name__    = "Keep2ShareCc"
     __type__    = "hoster"
-    __version__ = "0.27"
+    __version__ = "0.28"
     __status__  = "broken"
 
     __pattern__ = r'https?://(?:www\.)?(keep2share|k2s|keep2s)\.cc/file/(?P<ID>\w+)'
-    __config__  = [("activated"  , "bool", "Activated"                       , True),
-                   ("use_premium", "bool", "Use premium account if available", True)]
+    __config__  = [("activated"   , "bool", "Activated"                                        , True),
+                   ("use_premium" , "bool", "Use premium account if available"                 , True),
+                   ("fallback"    , "bool", "Fallback to free download if premium fails"       , True),
+                   ("chk_filesize", "bool", "Check file size"                                  , True),
+                   ("max_wait"    , "int" , "Reconnect if waiting time is greater than minutes", 10  )]
 
     __description__ = """Keep2Share.cc hoster plugin"""
     __license__     = "GPLv3"

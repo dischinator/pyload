@@ -9,13 +9,15 @@ from module.plugins.internal.utils import encode
 class TXT(Container):
     __name__    = "TXT"
     __type__    = "container"
-    __version__ = "0.18"
+    __version__ = "0.19"
     __status__  = "testing"
 
     __pattern__ = r'.+\.(txt|text)$'
-    __config__  = [("activated", "bool", "Activated", True),
-                   ("flush"   , "bool"  , "Flush list after adding", False  ),
-                   ("encoding", "string", "File encoding"          , "utf-8")]
+    __config__  = [("activated"            , "bool", "Activated"                          , True   ),
+                   ("use_subfolder"        , "bool", "Save package to subfolder"          , True   ),
+                   ("subfolder_per_package", "bool", "Create a subfolder for each package", True   ),
+                   ("flush"                , "bool", "Flush list after adding"            , False  ),
+                   ("encoding"             , "str" , "File encoding"                      , "utf-8")]
 
     __description__ = """Read link lists in plain text formats"""
     __license__     = "GPLv3"

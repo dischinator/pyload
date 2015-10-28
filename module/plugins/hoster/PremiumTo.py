@@ -11,13 +11,16 @@ from module.plugins.internal.utils import encode
 class PremiumTo(MultiHoster):
     __name__    = "PremiumTo"
     __type__    = "hoster"
-    __version__ = "0.27"
+    __version__ = "0.28"
     __status__  = "testing"
 
     __pattern__ = r'^unmatchable$'
-    __config__  = [("activated", "bool", "Activated", True),
-                   ("use_premium" , "bool", "Use premium account if available"    , True),
-                   ("revertfailed", "bool", "Revert to standard download if fails", True)]
+    __config__  = [("activated"   , "bool", "Activated"                                        , True ),
+                   ("use_premium" , "bool", "Use premium account if available"                 , True ),
+                   ("fallback"    , "bool", "Fallback to free download if premium fails"       , False),
+                   ("chk_filesize", "bool", "Check file size"                                  , True ),
+                   ("max_wait"    , "int" , "Reconnect if waiting time is greater than minutes", 10   ),
+                   ("revertfailed", "bool", "Revert to standard download if fails"             , True )]
 
     __description__ = """Premium.to multi-hoster plugin"""
     __license__     = "GPLv3"

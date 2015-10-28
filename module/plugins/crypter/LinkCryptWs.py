@@ -14,7 +14,7 @@ from module.plugins.internal.utils import html_unescape
 class LinkCryptWs(Crypter):
     __name__    = "LinkCryptWs"
     __type__    = "crypter"
-    __version__ = "0.13"
+    __version__ = "0.14"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?linkcrypt\.ws/(dir|container)/(?P<ID>\w+)'
@@ -32,7 +32,7 @@ class LinkCryptWs(Crypter):
 
 
     def setup(self):
-        self.links   = []
+        self.urls   = []
         self.sources = ['cnl', 'web', 'dlc', 'rsdf', 'ccf']
 
 
@@ -83,11 +83,11 @@ class LinkCryptWs(Crypter):
             links = self.handle_link_source(type)
 
             if links:
-                self.links.extend(links)
+                self.urls.extend(links)
                 break
 
-        if self.links:
-            self.packages = [(package_name, self.links, folder_name)]
+        if self.urls:
+            self.packages = [(package_name, self.urls, folder_name)]
 
 
     def is_online(self):
