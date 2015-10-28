@@ -8,12 +8,15 @@ from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
 class EuroshareEu(SimpleHoster):
     __name__    = "EuroshareEu"
     __type__    = "hoster"
-    __version__ = "0.35"
+    __version__ = "0.36"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?euroshare\.(eu|sk|cz|hu|pl)/file/.+'
-    __config__  = [("activated"  , "bool", "Activated"                       , True),
-                   ("use_premium", "bool", "Use premium account if available", True)]
+    __config__  = [("activated"   , "bool", "Activated"                                        , True),
+                   ("use_premium" , "bool", "Use premium account if available"                 , True),
+                   ("fallback"    , "bool", "Fallback to free download if premium fails"       , True),
+                   ("chk_filesize", "bool", "Check file size"                                  , True),
+                   ("max_wait"    , "int" , "Reconnect if waiting time is greater than minutes", 10  )]
 
     __description__ = """Euroshare.eu hoster plugin"""
     __license__     = "GPLv3"

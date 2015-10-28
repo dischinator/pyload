@@ -8,7 +8,7 @@ from module.plugins.internal.Crypter import Crypter, create_getInfo
 class SexuriaCom(Crypter):
     __name__    = "SexuriaCom"
     __type__    = "crypter"
-    __version__ = "0.11"
+    __version__ = "0.12"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?sexuria\.com/(v1/)?(Pornos_Kostenlos_.+?_(\d+)\.html|dl_links_\d+_\d+\.html|id=\d+\&part=\d+\&link=\d+)'
@@ -36,10 +36,10 @@ class SexuriaCom(Crypter):
         self.package = pyfile.package()
 
         #: Decrypt and add links
-        package_name, self.links, folder_name, package_pwd = self.decrypt_links(self.pyfile.url)
+        package_name, self.urls, folder_name, package_pwd = self.decrypt_links(self.pyfile.url)
         if package_pwd:
             self.pyfile.package().password = package_pwd
-        self.packages = [(package_name, self.links, folder_name)]
+        self.packages = [(package_name, self.urls, folder_name)]
 
 
     def decrypt_links(self, url):

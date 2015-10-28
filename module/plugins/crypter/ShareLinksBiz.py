@@ -11,13 +11,14 @@ from module.plugins.internal.Crypter import Crypter, create_getInfo
 class ShareLinksBiz(Crypter):
     __name__    = "ShareLinksBiz"
     __type__    = "crypter"
-    __version__ = "1.19"
+    __version__ = "1.20"
     __status__  = "testing"
 
     __pattern__ = r'http://(?:www\.)?(share-links|s2l)\.biz/(?P<ID>_?\w+)'
-    __config__  = [("activated"         , "bool", "Activated"                          , True),
-                   ("use_subfolder"     , "bool", "Save package to subfolder"          , True),
-                   ("subfolder_per_pack", "bool", "Create a subfolder for each package", True)]
+    __config__  = [("activated"            , "bool", "Activated"                          , True),
+                   ("use_premium"          , "bool", "Use premium account if available"   , True),
+                   ("use_subfolder"        , "bool", "Save package to subfolder"          , True),
+                   ("subfolder_per_package", "bool", "Create a subfolder for each package", True)]
 
     __description__ = """Share-Links.biz decrypter plugin"""
     __license__     = "GPLv3"

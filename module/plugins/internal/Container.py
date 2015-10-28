@@ -12,11 +12,13 @@ from module.plugins.internal.utils import encode, exists, fs_join
 class Container(Crypter):
     __name__    = "Container"
     __type__    = "container"
-    __version__ = "0.08"
+    __version__ = "0.09"
     __status__  = "stable"
 
     __pattern__ = r'^unmatchable$'
-    __config__  = [("activated", "bool", "Activated", True)]
+    __config__  = [("activated"            , "bool", "Activated"                          , True),
+                   ("use_subfolder"        , "bool", "Save package to subfolder"          , True),
+                   ("subfolder_per_package", "bool", "Create a subfolder for each package", True)]
 
     __description__ = """Base container decrypter plugin"""
     __license__     = "GPLv3"
@@ -34,7 +36,7 @@ class Container(Crypter):
 
         self.delete_tmp()
 
-        if self.urls:
+        if self.links:
             self._generate_packages()
 
         elif not self.packages:
