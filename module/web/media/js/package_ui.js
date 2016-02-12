@@ -5,7 +5,7 @@ document.addEvent("domready", function() {
     root.load.set("opacity", 0);
 
 
-    root.packageBox = new MooDialog({destroyOnHide: false});
+    root.packageBox = new MooDialog({destroyOnHide: false, closeOnOverlayClick: false});
     root.packageBox.setContent($('pack_box'));
 
     $('pack_reset').addEvent('click', function() {

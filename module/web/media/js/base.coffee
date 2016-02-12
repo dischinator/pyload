@@ -53,7 +53,7 @@ document.addEvent "domready", ->
     root.captchaBox = new MooDialog {destroyOnHide: false}
     root.captchaBox.setContent $ 'cap_box'
 
-    root.addBox = new MooDialog {destroyOnHide: false}
+    root.addBox = new MooDialog {destroyOnHide: false, closeOnOverlayClick: false}
     root.addBox.setContent $ 'add_box'
 
     $('add_form').onsubmit = ->
