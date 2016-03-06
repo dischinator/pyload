@@ -132,7 +132,7 @@
 </div>
 
 {% if perms.STATUS %}
-<div class="btn-group btn-group-sm col-xs-12 col-sm-3" role="group" aria-label="...">
+<div class="btn-group btn-group-sm col-xs-12 col-sm-3 col-md-2 col-lg-3" role="group" aria-label="...">
   <button id="action_play" class="btn btn-default col-xs-3" href="#"><span class="glyphicon glyphicon-play"></span>&nbsp;</button>
   <button id="action_stop" type="button" class="btn btn-default col-xs-3"><span class="glyphicon glyphicon-stop"></span>&nbsp;</button>
   <button id="action_cancel" type="button" class="btn btn-default col-xs-3"><span class="glyphicon glyphicon-remove"></span>&nbsp;</button>
@@ -148,11 +148,11 @@
 
 {% if perms.LIST %}
 
-<div class="btn-group btn-group-sm col-xs-12 col-sm-8 col-md-6 col-lg-5" role="group" aria-label="..." style="float:right;">
-  <button id="action_play" class="btn btn-default col-xs-6 col-sm-3"><span >{{_("Download:")}}</span>&nbsp;<span  class="label label-{% if status.download %}success{% else %}danger{% endif %}">{% if status.download %}{{_("on")}}{% else %}{{_("off")}}{% endif %}</span></button>
-  <button id="action_stop" type="button" class="btn btn-default col-xs-6 col-sm-3"><span>{{_("Reconnect:")}}</span>&nbsp;<span class="label label-{% if status.reconnect %}success{% else %}danger{% endif %}">{% if status.reconnect %}{{_("on")}}{% else %}{{_("off")}}{% endif %}</span></button>
-  <button id="action_cancel" type="button" class="btn btn-default col-xs-6 col-sm-3"><span class="action backlink">{{_("Speed:")}} <b id="speed">{{ status.speed }}</b></span></button>
-  <button id="action_add" type="button" class="btn btn-default col-xs-6 col-sm-3"><span class="action cog">{{_("Active:")}} <b id="aktiv" title="{{_("Active")}}">{{ status.active }}</b> / <b id="aktiv_from" title="{{_("Queued")}}">{{ status.queue }}</b> / <b id="aktiv_total" title="{{_("Total")}}">{{ status.total }}</b></span></button>
+<div class="btn-group btn-group-sm col-xs-12 col-sm-auto" role="group" aria-label="..." style="float:right;">
+  <button id="action_play" class="btn btn-default col-xs-6 col-sm-auto"><span >{{_("Download:")}}</span>&nbsp;<span  class="label label-{% if status.download %}success{% else %}danger{% endif %}">{% if status.download %}{{_("on")}}{% else %}{{_("off")}}{% endif %}</span></button>
+  <button id="action_stop" type="button" class="btn btn-default col-xs-6 col-sm-auto"><span>{{_("Reconnect:")}}</span>&nbsp;<span class="label label-{% if status.reconnect %}success{% else %}danger{% endif %}">{% if status.reconnect %}{{_("on")}}{% else %}{{_("off")}}{% endif %}</span></button>
+  <button id="action_cancel" type="button" class="btn btn-default col-xs-12 col-sm-auto"><span class="action backlink">{{_("Speed:")}} <b id="speed">{{ status.speed }}</b></span></button>
+  <button id="action_add" type="button" class="btn btn-default col-xs-12 col-sm-auto"><span class="action cog">{{_("Active:")}} <b id="aktiv" title="{{_("Active")}}">{{ status.active }}</b> / <b id="aktiv_from" title="{{_("Queued")}}">{{ status.queue }}</b> / <b id="aktiv_total" title="{{_("Total")}}">{{ status.total }}</b></span></button>
 </div>
 
 {% endif %}
