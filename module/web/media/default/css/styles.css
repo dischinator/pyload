@@ -15,3 +15,11 @@
     font-weight: bold;
     font-size: 14px;
 }
+
+.noPadding  {
+    padding: 0;
+}
+
+.width100 {
+    width: 100%;
+}
