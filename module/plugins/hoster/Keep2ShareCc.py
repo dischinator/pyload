@@ -4,13 +4,13 @@ import re
 import urlparse
 
 from module.plugins.captcha.ReCaptcha import ReCaptcha
-from module.plugins.internal.SimpleHoster import SimpleHoster, create_getInfo
+from module.plugins.internal.SimpleHoster import SimpleHoster
 
 
 class Keep2ShareCc(SimpleHoster):
     __name__    = "Keep2ShareCc"
     __type__    = "hoster"
-    __version__ = "0.28"
+    __version__ = "0.29"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?(keep2share|k2s|keep2s)\.cc/file/(?P<ID>\w+)'
@@ -29,7 +29,7 @@ class Keep2ShareCc(SimpleHoster):
     URL_REPLACEMENTS = [(__pattern__ + ".*", "http://keep2s.cc/file/\g<ID>")]
 
     NAME_PATTERN = r'File: <span>(?P<N>.+?)</span>'
-    SIZE_PATTERN = r'Size: (?P<S>[^<]+)</div>'
+    SIZE_PATTERN = r'Size: (?P<S>.+?)</div>'
 
     OFFLINE_PATTERN      = r'File not found or deleted|Sorry, this file is blocked or deleted|Error 404'
     TEMP_OFFLINE_PATTERN = r'Downloading blocked due to'
@@ -114,12 +114,13 @@ class Keep2ShareCc(SimpleHoster):
 
         m = re.search(self.CAPTCHA_PATTERN, self.data)
         self.log_debug("CAPTCHA_PATTERN found %s" % m)
+
         if m is not None:
             captcha_url = urlparse.urljoin("http://keep2s.cc/", m.group(1))
             post_data['CaptchaForm[code]'] = self.captcha.decrypt(captcha_url)
         else:
-            recaptcha = ReCaptcha(self)
-            response, challenge = recaptcha.challenge()
+            self.captcha = ReCaptcha(self.pyfile)
+            response, challenge = self.captcha.challenge()
             post_data.update({'recaptcha_challenge_field': challenge,
                               'recaptcha_response_field' : response})
 
@@ -129,7 +130,3 @@ class Keep2ShareCc(SimpleHoster):
             self.retry_captcha()
         else:
             self.captcha.correct()
-
-
-getInfo = create_getInfo(Keep2ShareCc)
-
