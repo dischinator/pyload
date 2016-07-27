@@ -3,13 +3,13 @@
 import re
 import urlparse
 
-from module.plugins.internal.XFSHoster import XFSHoster, create_getInfo
+from module.plugins.internal.XFSHoster import XFSHoster
 
 
 class UpleaCom(XFSHoster):
     __name__    = "UpleaCom"
     __type__    = "hoster"
-    __version__ = "0.16"
+    __version__ = "0.17"
     __status__  = "testing"
 
     __pattern__ = r'https?://(?:www\.)?uplea\.com/dl/\w{15}'
@@ -67,6 +67,3 @@ class UpleaCom(XFSHoster):
         m = re.search(r".ulCounter\({'timer':(\d+)}\)", self.data)
         if m:
             self.wait(m.group(1))
-
-
-getInfo = create_getInfo(UpleaCom)

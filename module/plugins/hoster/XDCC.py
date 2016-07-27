@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 
 import re
+import select
 import socket
 import struct
 import sys
 import time
 
-from select import select
-
 from module.plugins.internal.Hoster import Hoster
-from module.plugins.internal.utils import fs_join
+from module.plugins.internal.misc import fsjoin
 
 
-class Xdcc(Hoster):
-    __name__    = "Xdcc"
+class XDCC(Hoster):
+    __name__    = "XDCC"
     __type__    = "hoster"
-    __version__ = "0.36"
+    __version__ = "0.40"
     __status__  = "testing"
 
     __config__ = [("nick", "str", "Nickname", "pyload"),
@@ -67,9 +66,9 @@ class Xdcc(Hoster):
         chan = m.group(2)
         bot = m.group(3)
         pack = m.group(4)
-        nick = self.get_config('nick')
-        ident = self.get_config('ident')
-        real = self.get_config('realname')
+        nick = self.config.get('nick')
+        ident = self.config.get('ident')
+        real = self.config.get('realname')
 
         temp = server.split(':')
         ln = len(temp)
@@ -119,7 +118,7 @@ class Xdcc(Hoster):
                     sock.close()
                     self.fail(_("XDCC Bot did not answer"))
 
-            fdset = select([sock], [], [], 0)
+            fdset = select.select([sock], [], [], 0)
             if sock not in fdset[0]:
                 continue
 
@@ -150,7 +149,7 @@ class Xdcc(Hoster):
                     'text': msg[3][1:]
                 }
 
-                if nick is msg['target'][0:len(nick)] and "PRIVMSG" is msg['action']:
+                if nick == msg['target'][0:len(nick)] and "PRIVMSG" == msg['action']:
                     if msg['text'] == "\x01VERSION\x01":
                         self.log_debug("Sending CTCP VERSION")
                         sock.send("NOTICE %s :%s\r\n" % (msg['origin'], "pyLoad! IRC Interface"))
@@ -160,8 +159,8 @@ class Xdcc(Hoster):
                     elif msg['text'] == "\x01LAG\x01":
                         pass  #: don't know how to answer
 
-                if not (bot is msg['origin'][0:len(bot)]
-                        and nick is msg['target'][0:len(nick)]
+                if not (bot == msg['origin'][0:len(bot)]
+                        and nick == msg['target'][0:len(nick)]
                         and msg['action'] in ("PRIVMSG", "NOTICE")):
                     continue
 
@@ -188,14 +187,14 @@ class Xdcc(Hoster):
 
         self.pyfile.name = packname
 
-        dl_folder = self.pyload.config.get("general", "download_folder")
-        filename = fs_join(dl_folder, packname)
+        dl_folder = self.pyload.config.get('general', 'download_folder')
+        filename = fsjoin(dl_folder, packname)
 
         self.log_info(_("Downloading %s from %s:%d") % (packname, ip, port))
 
         self.pyfile.setStatus("downloading")
         newname = self.req.download(ip, port, filename, sock, self.pyfile.setProgress)
-        if newname and newname is not filename:
+        if newname and newname != filename:
             self.log_info(_("%(name)s saved as %(newname)s") % {'name': self.pyfile.name, 'newname': newname})
             filename = newname
 

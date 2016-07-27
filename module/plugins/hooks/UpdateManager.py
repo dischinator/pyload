@@ -8,18 +8,18 @@ import re
 import sys
 import time
 
-from module.plugins.internal.Addon import Expose, Addon, threaded
-from module.plugins.internal.utils import encode, exists, fs_join
+from module.plugins.internal.Addon import Addon
+from module.plugins.internal.misc import encode, exists, Expose, fsjoin, threaded
 
 
 class UpdateManager(Addon):
     __name__    = "UpdateManager"
     __type__    = "hook"
-    __version__ = "1.04"
+    __version__ = "1.14"
     __status__  = "testing"
 
     __config__ = [("activated"    , "bool", "Activated"                                , True ),
-                  ("checkinterval", "int" , "Check interval in hours"                  , 8    ),
+                  ("checkinterval", "int" , "Check interval in hours"                  , 6    ),
                   ("autorestart"  , "bool", "Auto-restart pyLoad when required"        , True ),
                   ("checkonstart" , "bool", "Check for updates on startup"             , True ),
                   ("checkperiod"  , "bool", "Check for updates periodically"           , True ),
@@ -33,7 +33,8 @@ class UpdateManager(Addon):
 
     _VERSION = re.compile(r'^\s*__version__\s*=\s*("|\')([\d.]+)\1', re.M)
 
-    SERVER_URL     = "http://updatemanager.pyload.org"
+    # SERVER_URL     = "http://updatemanager.pyload.org"
+    SERVER_URL     = "http://updatemanager-spyload.rhcloud.com"
     CHECK_INTERVAL = 3 * 60 * 60  #: 3 hours
 
 
@@ -45,7 +46,7 @@ class UpdateManager(Addon):
             if self.do_restart is False:
                 self.pyload.api.unpauseServer()
 
-        self.start_periodical(10)
+        self.periodical.start(10)
 
 
     def init(self):
@@ -53,7 +54,7 @@ class UpdateManager(Addon):
         self.mtimes    = {}  #: Store modification time for each plugin
         self.event_map = {'allDownloadsProcessed': "all_downloads_processed"}
 
-        if self.get_config('checkonstart'):
+        if self.config.get('checkonstart'):
             self.pyload.api.pauseServer()
             self.checkonstart = True
         else:
@@ -67,16 +68,16 @@ class UpdateManager(Addon):
             self.pyload.api.restart()
 
 
-    def periodical(self):
+    def periodical_task(self):
         if self.pyload.debug:
-            if self.get_config('reloadplugins'):
+            if self.config.get('reloadplugins'):
                 self.autoreload_plugins()
 
-            if self.get_config('nodebugupdate'):
+            if self.config.get('nodebugupdate'):
                 return
 
-        if self.get_config('checkperiod') and \
-           time.time() - max(self.CHECK_INTERVAL, self.get_config('checkinterval') * 60 * 60) > self.info['last_check']:
+        if self.config.get('checkperiod') and \
+           time.time() - max(self.CHECK_INTERVAL, self.config.get('checkinterval') * 60 * 60) > self.info['last_check']:
             self.update()
 
 
@@ -146,7 +147,7 @@ class UpdateManager(Addon):
         """
         Check for updates
         """
-        if self._update() is not 2 or not self.get_config('autorestart'):
+        if self._update() != 2 or not self.config.get('autorestart'):
             return
 
         if not self.pyload.api.statusDownloads():
@@ -170,11 +171,14 @@ class UpdateManager(Addon):
             self.log_info(_("pyLoad is up to date!"))
             exitcode = self.update_plugins()
 
-        else:
+        elif re.search(r'^\d+(?:\.\d+){0,3}[a-z]?$', newversion):
             self.log_info(_("***  New pyLoad %s available  ***") % newversion)
             self.log_info(_("***  Get it here: https://github.com/pyload/pyload/releases  ***"))
             self.info['pyload'] = True
             exitcode = 3
+
+        else:
+            exitcode = 0
 
         #: Exit codes:
         #:  -1 = No plugin updated, new pyLoad version available
@@ -252,8 +256,8 @@ class UpdateManager(Addon):
 
         if blacklist:
             #@NOTE: Protect UpdateManager from self-removing
-            blacklisted_plugins = [(plugin['type'], plugin['name']) for plugin in blacklist \
-                            if plugin['name'] is not self.classname and plugin['type'] is not self.__type__]
+            blacklisted_plugins = [(plugin['type'], plugin['name']) for plugin in blacklist
+                                   if plugin['name'] != self.classname and plugin['type'] != self.__type__]
 
             c = 1
             l = len(blacklisted_plugins)
@@ -283,7 +287,12 @@ class UpdateManager(Addon):
             plugins = getattr(self.pyload.pluginManager, "%sPlugins" % plugin_type.rstrip('s'))  #@TODO: Remove rstrip in 0.4.10
 
             oldver = float(plugins[plugin_name]['v']) if plugin_name in plugins else None
-            newver = float(plugin_version)
+            try:
+                newver = float(plugin_version)
+            except ValueError:
+                self.log_error(_("Error updating plugin: %s %s") % (plugin_type.rstrip('s').upper(), plugin_name),
+                               _("Bad version number on the server"))
+                continue
 
             if not oldver:
                 msg = "New plugin: %(type)s %(name)s (v%(newver).2f)"
@@ -304,7 +313,7 @@ class UpdateManager(Addon):
 
                 m = self._VERSION.search(content)
                 if m and m.group(2) == plugin_version:
-                    with open(fs_join("userplugins", plugin_type, plugin_name + ".py"), "wb") as f:
+                    with open(fsjoin("userplugins", plugin_type, plugin_name + ".py"), "wb") as f:
                         f.write(encode(content))
 
                     updated.append((plugin_type, plugin_name))
@@ -342,10 +351,10 @@ class UpdateManager(Addon):
             rootplugins = os.path.join(pypath, "module", "plugins")
 
             for basedir in ("userplugins", rootplugins):
-                py_filename  = fs_join(basedir, plugin_type, plugin_name + ".py")
+                py_filename  = fsjoin(basedir, plugin_type, plugin_name + ".py")
                 pyc_filename = py_filename + "c"
 
-                if plugin_type is "hook":
+                if plugin_type == "hook":
                     try:
                         self.manager.deactivateHook(plugin_name)
 

@@ -9,7 +9,7 @@ from module.plugins.internal.Account import Account
 class UploadedTo(Account):
     __name__    = "UploadedTo"
     __type__    = "account"
-    __version__ = "0.40"
+    __version__ = "0.42"
     __status__  = "testing"
 
     __description__ = """Uploaded.to account plugin"""
@@ -20,7 +20,7 @@ class UploadedTo(Account):
     COOKIES = False
 
     PREMIUM_PATTERN      = r'<em>Premium</em>'
-    VALID_UNTIL_PATTERN  = r'<td>Duration:</td>\s*<th>(.+?)<'
+    VALID_UNTIL_PATTERN  = r'<td>Duration:</td>\s*<th>\s*(.+?)<'
     TRAFFIC_LEFT_PATTERN = r'<b class="cB">(?P<S>[\d.,]+) (?P<U>[\w^_]+)'
 
 
@@ -61,15 +61,15 @@ class UploadedTo(Account):
     def signin(self, user, password, data):
         try:
             self.load("http://uploaded.net/me")
-    
+
             html = self.load("http://uploaded.net/io/login",
                              post={'id': user,
                                    'pw': password})
-    
+
             m = re.search(r'"err":"(.+?)"', html)
             if m is not None:
                 self.fail_login(m.group(1))
 
         except Exception, e:
-            self.log_error(e, trace=True)
+            self.log_error(e.message, trace=True)
             self.fail_login(e.message)
