@@ -559,7 +559,7 @@ def parse_size(value, unit=""):  #: returns bytes
     if m is None:
         return 0
 
-   if re.match(r'\d{1,3}(?:,\d{3})+(?:\.\d+)?$', m.group(1)):
+    if re.match(r'\d{1,3}(?:,\d{3})+(?:\.\d+)?$', m.group(1)):
         size = float(m.group(1).replace(',', ''))
 
     elif re.match(r'\d+,\d{2}$', m.group(1)):
