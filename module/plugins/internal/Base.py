@@ -422,6 +422,7 @@ class Base(Plugin):
         """
         Fail and indicates file ist temporary offline, the core may take consequences
         """
+        self.log_debug("temp. offline: " + msg)
         self.fail("temp. offline")
 
     def restart(self, msg="", premium=True):
