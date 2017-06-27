@@ -30,7 +30,7 @@ class ExtractionFinishedHook(Addon):
         subprocess.Popen(CMD, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         self.log_info("Moving known episodes...")
-        CMD = "/home/disch/scripts/move_serien.sh"
+        CMD = "/usr/local/bin/move_serien.sh"
         self.log_debug(CMD)
         p = subprocess.Popen(CMD, stdout=subprocess.PIPE)
         for line in iter(p.stdout.readline, b''): self.log_info("Moved: "+line.rstrip()),
